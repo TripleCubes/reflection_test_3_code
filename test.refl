@@ -1,0 +1,10 @@
+let a: number = - 10 + 5
+let b: number = math.sqrt[4](a)
+hello()
+if b >= 10 then
+	test(a)
+end
+
+fn test(a: number) -> void
+	printnum(a)
+end
