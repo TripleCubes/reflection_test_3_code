@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-enum BranchType {
+enum BranchType: int {
 	NONE,
 
 	NUM,
@@ -43,6 +43,8 @@ enum BranchType {
 	BRACKET_SQUARE,
 	BRACKET_CURLY,
 	BRACKET_FUNCCALL,
+
+	REVERSE_SIGN,
 };
 
 std::string to_str(BranchType branch_type);
