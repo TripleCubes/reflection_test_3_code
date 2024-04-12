@@ -32,7 +32,7 @@ void to_grouped_token_list(Branch &result, const Branch &token_list) {
 			if (token.type == NAME && nx_token.str == ".") {
 				grouping = true;
 			}
-			if (token.type == NAME && nx_token.str == "[") {
+			else if (token.type == NAME && nx_token.str == "[") {
 				grouping = true;
 			}
 			else {
@@ -60,5 +60,9 @@ void to_grouped_token_list(Branch &result, const Branch &token_list) {
 				grouping_finished();
 			}
 		}
+	}
+
+	if (grouping) {
+		grouping_finished();
 	}
 }

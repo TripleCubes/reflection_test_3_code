@@ -22,6 +22,26 @@ std::string to_str(BranchType branch_type) {
 	case OPERATOR: return "OPERATOR"; break;
 	case KEYWORD: return "KEYWORD"; break;
 
+	case VARNEW: return "VARNEW"; break;
+	case ASSIGN: return "ASSIGN"; break;
+	case FUNCCALL: return "FUNCCALL"; break;
+	case FUNCNEW: return "FUNCNEW"; break;
+	case IF: return "IF"; break;
+	case ELSEIF: return "ELSEIF"; break;
+	case ELSE: return "ELSE"; break;
+	case FOR: return "FOR"; break;
+	case FOREACH: return "FOREACH"; break;
+	case WHILE: return "WHILE"; break;
+
+	case RIGHT_SIDE: return "RIGHT_SIDE"; break;
+	case VAR_TYPE: return "VAR_TYPE"; break;
+	case ARGV: return "ARGV"; break;
+	case FUNCNEW_ARGV: return "FUNCNEW_ARGV"; break;
+	case RETURN_TYPES: return "RETURN_TYPES"; break;
+	case CODE_BLOCK: return "CODE_BLOCK"; break;
+	case CONDITIONS: return "CONDITIONS"; break;
+	case FOR_ITER_CONDITIONS: return "FOR_ITER_CONDITIONS"; break;
+
 	default: return "UNHANDLED"; break;
 	}
 

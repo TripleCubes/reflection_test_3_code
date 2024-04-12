@@ -5,14 +5,34 @@
 #include <vector>
 
 enum BranchType {
-	NONE        ,
+	NONE,
 
-	NUM         ,
-	NAME        ,
-	STR         ,
-	BRACKET     ,
-	OPERATOR    ,
-	KEYWORD     ,
+	NUM,
+	NAME,
+	STR,
+	BRACKET,
+	OPERATOR,
+	KEYWORD,
+
+	VARNEW,
+	ASSIGN,
+	FUNCCALL,
+	FUNCNEW,
+	IF,
+	ELSEIF,
+	ELSE,
+	FOR,
+	FOREACH,
+	WHILE,
+
+	RIGHT_SIDE,
+	VAR_TYPE,
+	ARGV,
+	FUNCNEW_ARGV,
+	RETURN_TYPES,
+	CODE_BLOCK,
+	CONDITIONS,
+	FOR_ITER_CONDITIONS,
 };
 
 std::string to_str(BranchType branch_type);

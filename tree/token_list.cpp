@@ -11,6 +11,7 @@ enum CharType {
 	CHAR_SPACE,
 	CHAR_BRACKET,
 	CHAR_OPERATOR,
+	CHAR_QUOTE,
 };
 
 CharType get_char_type(char c) {
@@ -28,14 +29,18 @@ CharType get_char_type(char c) {
 	if (c == ' ' or c == '\t' or c == '\n') {
 		return CHAR_SPACE;
 	}
+	if (c == 39 || c == 34) {
+		return CHAR_QUOTE;
+	}
 	return CHAR_OPERATOR;
 }
 
 std::vector<std::string> keyword_list = {
 	"let", "const",
-	"if", "elseif", "for", "while", "fn",
+	"if", "elseif", "for", "while", "fn", "then", "do",
 	"end",
 	"type",
+	"number", "string", "bool", "void",
 };
 
 bool is_keyword(const std::string &str) {
@@ -81,6 +86,8 @@ void to_token_list(Branch &result, const std::string &code_str) {
 		str = "";
 	};
 
+	char quote_char = ' ';
+
 	for (int i = 0; i < (int)code_str.length(); i++) {
 		char c = code_str[i];
 		CharType char_type = get_char_type(c);
@@ -105,6 +112,13 @@ void to_token_list(Branch &result, const std::string &code_str) {
 			} else {
 				token_finish();
 			}
+		} else if (token_type == STR) {
+			if (quote_char == c) {
+				str += c;
+				token_finish();
+			} else {
+				str += c;
+			}
 		}
 
 		if (token_type == NONE) {
@@ -116,6 +130,13 @@ void to_token_list(Branch &result, const std::string &code_str) {
 				token_type = BRACKET;
 			} else if (char_type == CHAR_OPERATOR) {
 				token_type = OPERATOR;
+			} else if (char_type == CHAR_QUOTE) {
+				if (quote_char != ' ') {
+					quote_char = ' ';
+				} else {
+					quote_char = c;
+					token_type = STR;
+				}
 			}
 
 			if (char_type != CHAR_SPACE) {
@@ -128,5 +149,9 @@ void to_token_list(Branch &result, const std::string &code_str) {
 			line++;
 			column = 1;
 		}
+	}
+
+	if (token_type != NONE) {
+		token_finish();
 	}
 }

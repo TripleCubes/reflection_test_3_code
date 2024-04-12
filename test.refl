@@ -1,6 +1,6 @@
 let a: number = - 10 + 5
 let b: number = math.sqrt[4](a)
-hello()
+hello.new()
 if b >= 10 then
 	test(a)
 end
