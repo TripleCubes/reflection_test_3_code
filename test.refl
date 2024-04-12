@@ -1,6 +1,6 @@
 let a: number = - 10 + 5
-let b: number = (2 + 5) + ([3, 8] + 9) 
-a = 10 + (30 * 8)
+let b: number = up(2 + 5) + down([3, 8] + 9) 
+a = 10 + down(30 * 8)
 hello.new()
 if b >= 10 then
 	test(a)

@@ -39,7 +39,10 @@ enum BranchType {
 	CONDITIONS,
 	FOR_ITER_CONDITIONS,
 
-	BRACKET_GROUP,
+	BRACKET_ROUND,
+	BRACKET_SQUARE,
+	BRACKET_CURLY,
+	BRACKET_FUNCCALL,
 };
 
 std::string to_str(BranchType branch_type);

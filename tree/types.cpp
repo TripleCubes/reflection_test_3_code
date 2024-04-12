@@ -59,7 +59,10 @@ std::string to_str(BranchType branch_type) {
 	case CONDITIONS: return "CONDITIONS"; break;
 	case FOR_ITER_CONDITIONS: return "FOR_ITER_CONDITIONS"; break;
 
-	case BRACKET_GROUP: return "BRACKET_GROUP"; break;
+	case BRACKET_ROUND: return "BRACKET_ROUND"; break;
+	case BRACKET_SQUARE: return "BRACKET_SQUARE"; break;
+	case BRACKET_CURLY: return "BRACKET_CURLY"; break;
+	case BRACKET_FUNCCALL: return "BRACKET_FUNCCALL"; break;
 
 	default: return "UNHANDLED"; break;
 	}
@@ -78,7 +81,6 @@ void print_branch(Branch branch, int indent) {
 		Branch sub_branch = branch.branch_list[i];
 		
 		if (is_temp(sub_branch.type)) { continue; }
-		//if (sub_branch.type == BRACKET_GROUP) { continue; }
 
 		print_branch(sub_branch, indent + 1);
 	}

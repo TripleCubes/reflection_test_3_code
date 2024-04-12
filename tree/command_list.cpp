@@ -111,7 +111,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 
 
 	Branch bracket_group;
-	bracket_group.type = BRACKET_GROUP;
+	bracket_group.type = BRACKET_ROUND;
 	bracket_group.line = right_side.line;
 	bracket_group.column = right_side.column;
 	to_calc_tree(bracket_group, right_side);
