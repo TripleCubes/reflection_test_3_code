@@ -33,6 +33,13 @@ std::string to_str(BranchType branch_type) {
 	case FOREACH: return "FOREACH"; break;
 	case WHILE: return "WHILE"; break;
 
+	case RIGHT_SIDE_TEMP: return "RIGHT_SIDE_TEMP"; break;
+	case ARGV_TEMP: return "ARGV_TEMP"; break;
+	case CONDITIONS_TEMP: return "CONDITIONS_TEMP"; break;
+	case FOR_ITER_CONDITIONS_TEMP: 
+		return "FOR_ITER_CONDITIONS_TEMP"; 
+		break;
+
 	case RIGHT_SIDE: return "RIGHT_SIDE"; break;
 	case VAR_TYPE: return "VAR_TYPE"; break;
 	case ARGV: return "ARGV"; break;
@@ -41,6 +48,8 @@ std::string to_str(BranchType branch_type) {
 	case CODE_BLOCK: return "CODE_BLOCK"; break;
 	case CONDITIONS: return "CONDITIONS"; break;
 	case FOR_ITER_CONDITIONS: return "FOR_ITER_CONDITIONS"; break;
+
+	case BRACKET_GROUP: return "BRACKET_GROUP"; break;
 
 	default: return "UNHANDLED"; break;
 	}

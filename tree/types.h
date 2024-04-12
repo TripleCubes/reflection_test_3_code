@@ -25,6 +25,11 @@ enum BranchType {
 	FOREACH,
 	WHILE,
 
+	RIGHT_SIDE_TEMP,
+	ARGV_TEMP,
+	CONDITIONS_TEMP,
+	FOR_ITER_CONDITIONS_TEMP,
+
 	RIGHT_SIDE,
 	VAR_TYPE,
 	ARGV,
@@ -33,6 +38,8 @@ enum BranchType {
 	CODE_BLOCK,
 	CONDITIONS,
 	FOR_ITER_CONDITIONS,
+
+	BRACKET_GROUP,
 };
 
 std::string to_str(BranchType branch_type);

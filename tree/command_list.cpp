@@ -1,7 +1,7 @@
 #include "command_list.h"
 
 #include "types.h"
-#include <iostream>
+#include "calc_tree.h"
 
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {
@@ -100,15 +100,22 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	Branch right_side_start = grouped_token_list
 	                          .branch_list[start_pos + 5];
 	Branch right_side;
-	right_side.type = RIGHT_SIDE;
+	right_side.type = RIGHT_SIDE_TEMP;
 	right_side.line = right_side_start.line;
 	right_side.column = right_side_start.column;
 	for (int i = start_pos + 5; i <= end_pos; i++) {
 		Branch v = grouped_token_list.branch_list[i];
 		right_side.branch_list.push_back(v);
 	}
-
 	branch.branch_list.push_back(right_side);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_GROUP;
+	bracket_group.line = right_side.line;
+	bracket_group.column = right_side.column;
+	to_calc_tree(bracket_group, right_side);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_assign(Branch &branch,
@@ -121,7 +128,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	Branch right_side_start = grouped_token_list
 	                          .branch_list[start_pos + 2];
 	Branch right_side;
-	right_side.type = RIGHT_SIDE;
+	right_side.type = RIGHT_SIDE_TEMP;
 	right_side.line = right_side_start.line;
 	right_side.column = right_side_start.column;
 	for (int i = start_pos + 2; i <= end_pos; i++) {
@@ -142,7 +149,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	Branch argv_start = grouped_token_list
 	                         .branch_list[start_pos + 2];
 	Branch argv;
-	argv.type = ARGV;
+	argv.type = ARGV_TEMP;
 	argv.line = argv_start.line;
 	argv.column = argv_start.column;
 	for (int i = start_pos + 2; i <= end_pos - 1; i++) {
@@ -240,7 +247,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	       = grouped_token_list.branch_list[code_block_start];
 
 	Branch conditions;
-	conditions.type = CONDITIONS;
+	conditions.type = CONDITIONS_TEMP;
 	conditions.line = token_conditions_start.line;
 	conditions.column = token_conditions_start.column;
 	for (int i = start_pos + 1; i <= conditions_end; i++) {
@@ -273,7 +280,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	       = grouped_token_list.branch_list[start_pos + 1];
 
 	Branch conditions;
-	conditions.type = CONDITIONS;
+	conditions.type = CONDITIONS_TEMP;
 	conditions.line = token_conditions_start.line;
 	conditions.column = token_conditions_start.column;
 	for (int i = start_pos + 1; i <= conditions_end; i++) {
@@ -298,7 +305,7 @@ int code_block_start) {
 	       = grouped_token_list.branch_list[code_block_start];
 
 	Branch iter_conditions;
-	iter_conditions.type = FOR_ITER_CONDITIONS;
+	iter_conditions.type = FOR_ITER_CONDITIONS_TEMP;
 	iter_conditions.line = token_iter_cond_start.line;
 	iter_conditions.column = token_iter_cond_start.column;
 	for (int i = iter_conditions_start; i <= iter_conditions_end; i++){
@@ -378,7 +385,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	       = grouped_token_list.branch_list[code_block_start];
 
 	Branch conditions;
-	conditions.type = CONDITIONS;
+	conditions.type = CONDITIONS_TEMP;
 	conditions.line = token_conditions_start.line;
 	conditions.column = token_conditions_start.column;
 	for (int i = start_pos + 1; i <= conditions_end; i++) {
