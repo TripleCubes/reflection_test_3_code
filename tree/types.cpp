@@ -9,6 +9,16 @@ std::string spaces(int n) {
 	}
 	return s;
 }
+
+bool is_temp(BranchType type) {
+	if (type == RIGHT_SIDE_TEMP
+	|| type == ARGV_TEMP
+	|| type == CONDITIONS_TEMP
+	|| type == FOR_ITER_CONDITIONS_TEMP) {
+		return true;
+	}
+	return false;
+}
 }
 
 std::string to_str(BranchType branch_type) {
@@ -60,9 +70,16 @@ std::string to_str(BranchType branch_type) {
 void print_branch(Branch branch, int indent) {
 	std::string s = spaces(indent * 4);
 	std::cout << s << to_str(branch.type) << std::endl;
+	
 	if (branch.str != "")
 		std::cout << s << "    " << branch.str << std::endl;
+	
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
-		print_branch(branch.branch_list[i], indent + 1);
+		Branch sub_branch = branch.branch_list[i];
+		
+		if (is_temp(sub_branch.type)) { continue; }
+		//if (sub_branch.type == BRACKET_GROUP) { continue; }
+
+		print_branch(sub_branch, indent + 1);
 	}
 }
