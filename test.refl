@@ -1,7 +1,7 @@
-let a: number = - 10 + - 5 + test(-3, (2 + 3), -7, 4)
+let a: number = - 10 + - 5 + test(-3, 2 + 3, -7, 4)
 let b: number = 2 + (3 + - 4) + - (4 + 6)
 a = 10 + down(30 * 8)
-hello.new()
+hello.new(10, -20)
 if b >= 10 then
 	test(a)
 end

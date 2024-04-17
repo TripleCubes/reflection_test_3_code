@@ -19,3 +19,15 @@ bool is_bracket_type(BranchType type) {
 	}
 	return false;
 }
+
+void branch_rm(Branch &bracket, int i) {
+	bracket.branch_list.erase(
+		bracket.branch_list.begin() + i
+	);
+}
+
+void branch_add(Branch &bracket, int i, Branch &branch) {
+	bracket.branch_list.insert(
+		bracket.branch_list.begin() + i, branch
+	);
+}

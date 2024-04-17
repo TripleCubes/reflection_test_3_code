@@ -63,6 +63,7 @@ std::string to_str(BranchType branch_type) {
 	case BRACKET_SQUARE: return "BRACKET_SQUARE"; break;
 	case BRACKET_CURLY: return "BRACKET_CURLY"; break;
 	case BRACKET_FUNCCALL: return "BRACKET_FUNCCALL"; break;
+	case BRACKET_ARGUMENT: return "BRACKET_ARGUMENT"; break;
 
 	case REVERSE_SIGN: return "REVERSE_SIGN"; break;
 
