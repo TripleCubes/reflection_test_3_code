@@ -5,17 +5,20 @@
 #include <iostream>
 
 void group_by_operator(Branch &bracket, const std::string &op_str) {
+	for (int i = 0; i < get_bracket_size(bracket); i++) {
+		Branch &v = bracket.branch_list[i];
+		if (is_bracket_type(v.type)) {
+			group_by_operator(v, op_str);
+		}
+	}
+
 	int i = 0;
 
 	while (i < get_bracket_size(bracket)) {
-		Branch &v = bracket.branch_list[i];
+		Branch v = bracket.branch_list[i];
 		Branch nx;
 		if (i + 1 < get_bracket_size(bracket)) {
 			nx = bracket.branch_list[i + 1];
-		}
-
-		if (is_bracket_type(v.type)) {
-			group_by_operator(v, op_str);
 		}
 
 		std::cout << to_str(v.type) << std::endl;

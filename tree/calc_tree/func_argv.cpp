@@ -20,6 +20,13 @@ const Branch &bracket, int start, int end) {
 }
 
 void func_argv(Branch &bracket) {
+	for (int i = 0; i < get_bracket_size(bracket); i++) {
+		Branch &v = bracket.branch_list[i];
+		if (is_bracket_type(v.type)) {
+			func_argv(v);
+		}
+	}
+
 	int i = 0;
 	int start = 0;
 
@@ -35,14 +42,9 @@ void func_argv(Branch &bracket) {
 	};
 
 	while (i < get_bracket_size(bracket)) {
-		Branch &v = bracket.branch_list[i];
 		Branch nx;
 		if (i + 1 < get_bracket_size(bracket)) {
 			nx = bracket.branch_list[i + 1];
-		}
-
-		if (is_bracket_type(v.type)) {
-			func_argv(v);
 		}
 
 		if (bracket.type == BRACKET_FUNCCALL

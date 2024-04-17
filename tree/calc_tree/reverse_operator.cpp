@@ -6,9 +6,16 @@
 
 void reverse_operator(Branch &bracket, const std::string &op,
 BranchType reversed_type) {
+	for (int i = 0; i < get_bracket_size(bracket); i++) {
+		Branch &v = bracket.branch_list[i];
+		if (is_bracket_type(v.type)) {
+			reverse_operator(v, op, reversed_type);
+		}
+	}
+
 	int i = 0;
 	while (i < get_bracket_size(bracket)) {
-		Branch &v = bracket.branch_list[i];
+		Branch v = bracket.branch_list[i];
 		Branch nx;
 		Branch prev;
 		if (i + 1 < get_bracket_size(bracket)) {
@@ -29,9 +36,6 @@ BranchType reversed_type) {
 			branch_add(bracket, i + 2, reversed);
 			branch_rm(bracket, i + 1);
 			branch_rm(bracket, i);
-		}
-		else if (is_bracket_type(v.type)) {
-			reverse_operator(v, op, reversed_type);
 		}
 
 		i++;
