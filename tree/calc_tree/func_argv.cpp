@@ -53,11 +53,13 @@ void func_argv(Branch &bracket) {
 		i++;
 	}
 
-	int bracket_sz = get_bracket_size(bracket);
-	Branch argument;
-	argument_bracket_new(argument, bracket, start, bracket_sz - 1);
-	for (int j = start; j <= bracket_sz - 1; j++) {
-		branch_rm(bracket, start);
+	if (bracket.type == BRACKET_FUNCCALL) {
+		int bracket_sz = get_bracket_size(bracket);
+		Branch argument;
+		argument_bracket_new(argument, bracket, start, bracket_sz - 1);
+		for (int j = start; j <= bracket_sz - 1; j++) {
+			branch_rm(bracket, start);
+		}
+		branch_add(bracket, start, argument);
 	}
-	branch_add(bracket, start, argument);
 }

@@ -14,7 +14,8 @@ bool is_bracket_type(BranchType type) {
 	if (type == BRACKET_ROUND
 	|| type == BRACKET_SQUARE
 	|| type == BRACKET_CURLY
-	|| type == BRACKET_FUNCCALL) {
+	|| type == BRACKET_FUNCCALL
+	|| type == BRACKET_ARGUMENT) {
 		return true;
 	}
 	return false;
