@@ -137,6 +137,14 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	}
 
 	branch.branch_list.push_back(right_side);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = right_side.line;
+	bracket_group.column = right_side.column;
+	to_calc_tree(bracket_group, right_side);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_funccall(Branch &branch,
@@ -156,8 +164,17 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 		Branch v = grouped_token_list.branch_list[i];
 		argv.branch_list.push_back(v);
 	}
+	argv.branch_list.push_back(func_name_token);
 
 	branch.branch_list.push_back(argv);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_FUNCCALL;
+	bracket_group.line = argv.line;
+	bracket_group.column = argv.column;
+	to_calc_tree(bracket_group, argv);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_funcnew(Branch &branch,
@@ -263,6 +280,14 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	to_command_list(code_block, grouped_token_list,
 	code_block_start, end_pos - 1);
 	branch.branch_list.push_back(code_block);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = conditions.line;
+	bracket_group.column = conditions.column;
+	to_calc_tree(bracket_group, conditions);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_elseif(Branch &branch,
@@ -288,6 +313,14 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 		conditions.branch_list.push_back(token);
 	}
 	branch.branch_list.push_back(conditions);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = conditions.line;
+	bracket_group.column = conditions.column;
+	to_calc_tree(bracket_group, conditions);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_for_iter(Branch &branch,
@@ -312,7 +345,10 @@ int code_block_start) {
 		Branch token = grouped_token_list.branch_list[i];
 		iter_conditions.branch_list.push_back(token);
 	}
+	Branch for_token = grouped_token_list.branch_list[start_pos];
+	iter_conditions.branch_list.push_back(for_token);
 	branch.branch_list.push_back(iter_conditions);
+
 
 	Branch code_block;
 	code_block.type = CODE_BLOCK;
@@ -321,6 +357,14 @@ int code_block_start) {
 	to_command_list(code_block, grouped_token_list,
 	code_block_start, end_pos - 1);
 	branch.branch_list.push_back(code_block);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_FUNCCALL;
+	bracket_group.line = iter_conditions.line;
+	bracket_group.column = iter_conditions.column;
+	to_calc_tree(bracket_group, iter_conditions);
+	branch.branch_list.push_back(bracket_group);
 }
 
 void new_branch_for_each(Branch &branch,
@@ -355,7 +399,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 		}
 	}
 
-	Branch plus_2 = grouped_token_list.branch_list[start_pos + 1];
+	Branch plus_2 = grouped_token_list.branch_list[start_pos + 2];
 	if (plus_2.type == OPERATOR && plus_2.str == "=") {
 		new_branch_for_iter(branch, grouped_token_list, start_pos,
 		end_pos, code_block_start);
@@ -401,6 +445,14 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	to_command_list(code_block, grouped_token_list,
 	code_block_start, end_pos - 1);
 	branch.branch_list.push_back(code_block);
+
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = conditions.line;
+	bracket_group.column = conditions.column;
+	to_calc_tree(bracket_group, conditions);
+	branch.branch_list.push_back(bracket_group);
 }
 }
 
