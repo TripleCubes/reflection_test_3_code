@@ -46,6 +46,9 @@ enum BranchType: int {
 	BRACKET_ARGUMENT,
 
 	REVERSE_SIGN,
+
+	CALC_START,
+	CALC,
 };
 
 std::string to_str(BranchType branch_type);

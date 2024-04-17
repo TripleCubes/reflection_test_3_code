@@ -5,6 +5,7 @@
 #include "calc_tree/reverse_operator.h"
 #include "calc_tree/func_argv.h"
 #include "calc_tree/group_by_operator.h"
+#include "calc_tree/calc.h"
 
 void to_calc_tree(Branch &result, const Branch &token_list) {
 	to_bracket_tree(result, token_list, 0,
@@ -12,4 +13,5 @@ void to_calc_tree(Branch &result, const Branch &token_list) {
 	reverse_operator(result, "-", REVERSE_SIGN);
 	func_argv(result);
 	group_by_operator(result, "*");
+	bracket_to_calc(result);
 }

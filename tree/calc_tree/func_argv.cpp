@@ -30,6 +30,10 @@ void func_argv(Branch &bracket) {
 	int i = 0;
 	int start = 0;
 
+	if (!is_argv_bracket_type(bracket.type)) {
+		return;
+	}
+
 	auto argument_finished = [&i, &start, &bracket]() -> void {
 		Branch argument;
 		argument_bracket_new(argument, bracket, start, i);
@@ -47,21 +51,18 @@ void func_argv(Branch &bracket) {
 			nx = bracket.branch_list[i + 1];
 		}
 
-		if (is_argv_bracket_type(bracket.type)
-		&& nx.type == OPERATOR && nx.str == ",") {
+		if (nx.type == OPERATOR && nx.str == ",") {
 			argument_finished();
 		}
 
 		i++;
 	}
 
-	if (is_argv_bracket_type(bracket.type)) {
-		int bracket_sz = get_bracket_size(bracket);
-		Branch argument;
-		argument_bracket_new(argument, bracket, start, bracket_sz - 1);
-		for (int j = start; j <= bracket_sz - 1; j++) {
-			branch_rm(bracket, start);
-		}
-		branch_add(bracket, start, argument);
+	int bracket_sz = get_bracket_size(bracket);
+	Branch argument;
+	argument_bracket_new(argument, bracket, start, bracket_sz - 1);
+	for (int j = start; j <= bracket_sz - 1; j++) {
+		branch_rm(bracket, start);
 	}
+	branch_add(bracket, start, argument);
 }
