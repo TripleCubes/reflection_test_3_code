@@ -47,7 +47,7 @@ void func_argv(Branch &bracket) {
 			nx = bracket.branch_list[i + 1];
 		}
 
-		if (bracket.type == BRACKET_FUNCCALL
+		if (is_argv_bracket_type(bracket.type)
 		&& nx.type == OPERATOR && nx.str == ",") {
 			argument_finished();
 		}
@@ -55,7 +55,7 @@ void func_argv(Branch &bracket) {
 		i++;
 	}
 
-	if (bracket.type == BRACKET_FUNCCALL) {
+	if (is_argv_bracket_type(bracket.type)) {
 		int bracket_sz = get_bracket_size(bracket);
 		Branch argument;
 		argument_bracket_new(argument, bracket, start, bracket_sz - 1);

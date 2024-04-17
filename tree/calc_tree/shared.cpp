@@ -21,6 +21,15 @@ bool is_bracket_type(BranchType type) {
 	return false;
 }
 
+bool is_argv_bracket_type(BranchType type) {
+	if (type == BRACKET_SQUARE
+	|| type == BRACKET_CURLY
+	|| type == BRACKET_FUNCCALL) {
+		return true;
+	}
+	return false;
+}
+
 void branch_rm(Branch &bracket, int i) {
 	bracket.branch_list.erase(
 		bracket.branch_list.begin() + i
