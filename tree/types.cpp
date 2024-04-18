@@ -42,22 +42,23 @@ std::string to_str(BranchType branch_type) {
 	case FOR: return "FOR"; break;
 	case FOREACH: return "FOREACH"; break;
 	case WHILE: return "WHILE"; break;
+	case TYPE: return "TYPE"; break;
 
 	case RIGHT_SIDE_TEMP: return "RIGHT_SIDE_TEMP"; break;
 	case ARGV_TEMP: return "ARGV_TEMP"; break;
 	case CONDITIONS_TEMP: return "CONDITIONS_TEMP"; break;
-	case FOR_ITER_CONDITIONS_TEMP: 
-		return "FOR_ITER_CONDITIONS_TEMP"; 
+	case FOR_ITER_CONDITIONS_TEMP:
+		return "FOR_ITER_CONDITIONS_TEMP";
 		break;
 
-	case RIGHT_SIDE: return "RIGHT_SIDE"; break;
+//	case RIGHT_SIDE: return "RIGHT_SIDE"; break;
 	case VAR_TYPE: return "VAR_TYPE"; break;
-	case ARGV: return "ARGV"; break;
+//	case ARGV: return "ARGV"; break;
 	case FUNCNEW_ARGV: return "FUNCNEW_ARGV"; break;
 	case RETURN_TYPES: return "RETURN_TYPES"; break;
 	case CODE_BLOCK: return "CODE_BLOCK"; break;
-	case CONDITIONS: return "CONDITIONS"; break;
-	case FOR_ITER_CONDITIONS: return "FOR_ITER_CONDITIONS"; break;
+//	case CONDITIONS: return "CONDITIONS"; break;
+//	case FOR_ITER_CONDITIONS: return "FOR_ITER_CONDITIONS"; break;
 
 	case BRACKET_ROUND: return "BRACKET_ROUND"; break;
 	case BRACKET_SQUARE: return "BRACKET_SQUARE"; break;
@@ -71,6 +72,8 @@ std::string to_str(BranchType branch_type) {
 	case CALC: return "CALC"; break;
 
 	case ARRAY_INDEX: return "ARRAY_INDEX"; break;
+	case TYPE_MEMBER: return "TYPE_MEMBER"; break;
+	case TYPE_MEMBER_LIST: return "TYPE_MEMBER_LIST"; break;
 
 	default: return "UNHANDLED"; break;
 	}

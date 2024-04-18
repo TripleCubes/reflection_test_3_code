@@ -2,7 +2,6 @@
 
 #include "../types.h"
 #include "shared.h"
-#include <iostream>
 
 void group_by_operator(Branch &bracket, const std::string &op_str) {
 	if (get_bracket_size(bracket) == 0) {
@@ -25,7 +24,6 @@ void group_by_operator(Branch &bracket, const std::string &op_str) {
 			nx = bracket.branch_list[i + 1];
 		}
 
-		std::cout << to_str(v.type) << std::endl;
 		if (nx.type == OPERATOR && nx.str == op_str) {
 			Branch grouped;
 			grouped.type = BRACKET_ROUND;

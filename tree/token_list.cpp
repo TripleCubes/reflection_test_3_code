@@ -136,10 +136,11 @@ void to_token_list(Branch &result, const std::string &code_str) {
 				} else {
 					quote_char = c;
 					token_type = STR;
+					str += c;
 				}
 			}
 
-			if (char_type != CHAR_SPACE) {
+			if (char_type != CHAR_SPACE && char_type != CHAR_QUOTE) {
 				str += c;
 			}
 		}

@@ -1,5 +1,6 @@
-let arr: number[] = [10, 20]
-
-arr[3] = 50
-
-print(arr[3])
+type test {
+	a: number = 0,
+	b: string = "AAA",
+	c: number[] = [],
+	d: string = "This is a test",
+}

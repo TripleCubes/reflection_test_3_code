@@ -62,6 +62,21 @@ bool code_block_end(const Branch &token, int &code_block_count) {
 	return false;
 }
 
+bool curly_bracket_block_end(const Branch &token, int &curly_count) {
+	if (token.str == "{") {
+		curly_count++;
+	}
+	if (token.str == "}") {
+		curly_count--;
+
+		if (curly_count == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool is_return_type(const Branch &token) {
 	if (token.type != KEYWORD && token.type != NAME) {
 		return false;
@@ -90,7 +105,7 @@ bool is_return_type(const Branch &token) {
 //}
 
 void new_branch_varnew(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch var_name_token = grouped_token_list
 		                    .branch_list[start_pos + 1];
 	branch.branch_list.push_back(var_name_token);
@@ -102,12 +117,12 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	branch.branch_list.push_back(var_type_token);
 
 
-	Branch _4th = grouped_token_list.branch_list[start_pos + 4];
-	if (_4th.type == BRACKET && _4th.str == "[") {
+	Branch plus_4 = grouped_token_list.branch_list[start_pos + 4];
+	if (plus_4.type == BRACKET && plus_4.str == "[") {
 		Branch array_sz;
 		array_sz.type = ARRAY_INDEX;
-		array_sz.line = _4th.line;
-		array_sz.column = _4th.column;
+		array_sz.line = plus_4.line;
+		array_sz.column = plus_4.column;
 		branch.branch_list.push_back(array_sz);
 	}
 
@@ -117,6 +132,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 		Branch v = grouped_token_list.branch_list[i];
 		if (v.type == OPERATOR && v.str == "=") {
 			right_side_start_at = i + 1;
+			break;
 		}
 	}
 
@@ -143,7 +159,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_assign(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch var_name_token = grouped_token_list
 	                        .branch_list[start_pos];
 	branch.branch_list.push_back(var_name_token);
@@ -172,7 +188,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_funccall(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch func_name_token = grouped_token_list
 	                         .branch_list[start_pos];
 	branch.branch_list.push_back(func_name_token);
@@ -202,7 +218,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_funcnew(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int argv_start = start_pos + 3;
 	int argv_end = 0;
 	int return_type_start = 0;
@@ -270,7 +286,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_if(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int conditions_end = 0;
 	int code_block_start = 0;
 	for (int i = start_pos + 1; i <= end_pos; i++) {
@@ -315,7 +331,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_elseif(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int conditions_end = 0;
 	for (int i = start_pos + 1; i <= end_pos; i++) {
 		Branch token = grouped_token_list.branch_list[i];
@@ -348,7 +364,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_for_iter(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos,
+const Branch &grouped_token_list, int start_pos, int end_pos,
 int code_block_start) {
 	Branch iter = grouped_token_list.branch_list[start_pos + 1];
 	branch.branch_list.push_back(iter);
@@ -392,7 +408,7 @@ int code_block_start) {
 }
 
 void new_branch_for_each(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos,
+const Branch &grouped_token_list, int start_pos, int end_pos,
 int code_block_start) {
 	Branch iter = grouped_token_list.branch_list[start_pos + 1];
 	Branch val = grouped_token_list.branch_list[start_pos + 3];
@@ -414,7 +430,7 @@ int code_block_start) {
 }
 
 void new_branch_for(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int code_block_start = 0;
 	for (int i = start_pos; i <= end_pos; i++) {
 		Branch token = grouped_token_list.branch_list[i];
@@ -435,7 +451,7 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 }
 
 void new_branch_while(Branch &branch,
-const Branch& grouped_token_list, int start_pos, int end_pos) {
+const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int conditions_end = 0;
 	int code_block_start = 0;
 	for (int i = start_pos + 1; i <= end_pos; i++) {
@@ -478,6 +494,101 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	to_calc_tree(bracket_group, conditions);
 	branch.branch_list.push_back(bracket_group);
 }
+
+void to_member(Branch &member,
+const Branch &grouped_token_list, int member_start, int member_end) {
+	Branch token_name = grouped_token_list.branch_list[member_start];
+	member.branch_list.push_back(token_name);
+
+	Branch token_type = grouped_token_list.branch_list[member_start+2];
+	member.branch_list.push_back(token_type);
+
+	Branch plus_3 = grouped_token_list.branch_list[member_start + 3];
+	if (plus_3.type == BRACKET && plus_3.str == "[") {
+		Branch array_index;
+		array_index.type = ARRAY_INDEX;
+		array_index.line = plus_3.line;
+		array_index.column = plus_3.column;
+		member.branch_list.push_back(array_index);
+	}
+
+	int right_side_start_at = 0;
+	for (int i = member_start; i <= member_end; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		if (v.type == OPERATOR && v.str == "=") {
+			right_side_start_at = i + 1;
+			break;
+		}
+	}
+
+	Branch right_side_start = grouped_token_list
+	                          .branch_list[right_side_start_at];
+	Branch right_side;
+	right_side.type = RIGHT_SIDE_TEMP;
+	right_side.line = right_side_start.line;
+	right_side.column = right_side_start.column;
+	for (int i = right_side_start_at; i <= member_end; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		right_side.branch_list.push_back(v);
+	}
+	member.branch_list.push_back(right_side);
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = right_side.line;
+	bracket_group.column = right_side.column;
+	to_calc_tree(bracket_group, right_side);
+	member.branch_list.push_back(bracket_group);
+}
+
+void to_type_content(Branch &content,
+const Branch &grouped_token_list, int content_start, int content_end) {
+	int start = content_start;
+
+	auto member_finished = [&start, &content,
+	&grouped_token_list](int end) -> void {
+		Branch start_token
+			   = grouped_token_list.branch_list[start];
+		Branch member;
+		member.type = TYPE_MEMBER;
+		member.line = start_token.line;
+		member.column = start_token.column;
+
+		to_member(member, grouped_token_list, start, end);
+		content.branch_list.push_back(member);
+	};
+
+	for (int i = content_start; i <= content_end; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		if (v.type == OPERATOR && v.str == ",") {
+			member_finished(i - 1);
+			start = i + 1;
+		}
+	}
+
+	if (start < content_end + 1) {
+		member_finished(content_end);
+	}
+}
+
+void new_branch_type(Branch &branch,
+const Branch &grouped_token_list, int start_pos, int end_pos) {
+	Branch name_token = grouped_token_list.branch_list[start_pos + 1];
+	branch.branch_list.push_back(name_token);
+
+	
+	int content_start = start_pos + 3;
+	int content_end = end_pos - 1;
+	Branch content_start_token
+	       = grouped_token_list.branch_list[content_start];
+	Branch content;
+	content.type = TYPE_MEMBER_LIST;
+	content.line = content_start_token.line;
+	content.column = content_start_token.column;
+	to_type_content(content, grouped_token_list,
+		content_start, content_end);
+	branch.branch_list.push_back(content);
+}
 }
 
 void to_command_list(Branch &result, const Branch &grouped_token_list,
@@ -519,6 +630,9 @@ int start_pos, int end_pos) {
 		} else if (command_type == WHILE) {
 			new_branch_while(new_branch, grouped_token_list,
 			command_start_pos, command_end_pos);
+		} else if (command_type == TYPE) {
+			new_branch_type(new_branch, grouped_token_list,
+			command_start_pos, command_end_pos);
 		}
 
 		result.branch_list.push_back(new_branch);
@@ -526,6 +640,7 @@ int start_pos, int end_pos) {
 	};
 
 	int code_block_count = 0;
+	int curly_count = 0;
 	
 	for (int i = start_pos; i <= end_pos; i++) {
 		Branch token = grouped_token_list.branch_list[i];
@@ -575,6 +690,11 @@ int start_pos, int end_pos) {
 				code_block_count = 0;
 				command_type = WHILE;
 			}
+			else if (token.str == "type") {
+				command_start_pos = i;
+				curly_count = 0;
+				command_type = TYPE;
+			}
 		}
 		if (command_type == VARNEW) {
 			if (right_side_end(token, nx_token)) {
@@ -616,6 +736,11 @@ int start_pos, int end_pos) {
 		}
 		if (command_type == WHILE) {
 			if (code_block_end(token, code_block_count)) {
+				command_finished(i);
+			}
+		}
+		if (command_type == TYPE) {
+			if (curly_bracket_block_end(token, curly_count)) {
 				command_finished(i);
 			}
 		}
