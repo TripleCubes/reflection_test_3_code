@@ -1,6 +1,8 @@
-type test {
-	a: number = 0,
-	b: string = "AAA",
-	c: number[] = [],
-	d: string = "This is a test",
+type Vec2 {
+	x: number = 0,
+	y: number = 0,
 }
+
+fn vecnew(x: number, y: number) -> Vec2
+	print(x, y)
+end

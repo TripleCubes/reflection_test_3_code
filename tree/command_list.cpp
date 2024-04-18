@@ -78,7 +78,11 @@ bool curly_bracket_block_end(const Branch &token, int &curly_count) {
 }
 
 bool is_return_type(const Branch &token) {
-	if (token.type != KEYWORD && token.type != NAME) {
+	if (token.type == NAME) {
+		return true;
+	}
+
+	if (token.type != KEYWORD) {
 		return false;
 	}
 
