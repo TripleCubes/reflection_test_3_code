@@ -5,6 +5,10 @@
 #include <iostream>
 
 void group_by_operator(Branch &bracket, const std::string &op_str) {
+	if (get_bracket_size(bracket) == 0) {
+		return;
+	}
+
 	for (int i = 0; i < get_bracket_size(bracket); i++) {
 		Branch &v = bracket.branch_list[i];
 		if (is_bracket_type(v.type)) {

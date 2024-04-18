@@ -49,6 +49,8 @@ enum BranchType: int {
 
 	CALC_START,
 	CALC,
+
+	ARRAY_INDEX,
 };
 
 std::string to_str(BranchType branch_type);

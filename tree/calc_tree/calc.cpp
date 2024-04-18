@@ -4,6 +4,10 @@
 #include "shared.h"
 
 void bracket_to_calc(Branch &bracket) {
+	if (get_bracket_size(bracket) == 0) {
+		return;
+	}
+
 	for (int i = 0; i < get_bracket_size(bracket); i++) {
 		Branch &v = bracket.branch_list[i];
 		if (is_bracket_type(v.type)) {

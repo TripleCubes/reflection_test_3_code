@@ -70,6 +70,8 @@ std::string to_str(BranchType branch_type) {
 	case CALC_START: return "CALC_START"; break;
 	case CALC: return "CALC"; break;
 
+	case ARRAY_INDEX: return "ARRAY_INDEX"; break;
+
 	default: return "UNHANDLED"; break;
 	}
 

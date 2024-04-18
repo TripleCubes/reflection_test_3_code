@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "calc_tree.h"
+#include <string>
 
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {
@@ -17,6 +18,10 @@ bool is_right_side_value(const Branch &token) {
 		return true;
 	}
 	if (token.str == "true" || token.str == "false") {
+		return true;
+	}
+	if (token.type == BRACKET && (token.str == ")"
+	|| token.str == "]" || token.str == "}")) {
 		return true;
 	}
 	return false;
@@ -97,13 +102,38 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 	branch.branch_list.push_back(var_type_token);
 
 
+	Branch _4th = grouped_token_list.branch_list[start_pos + 4];
+	Branch _5th = grouped_token_list.branch_list[start_pos + 5];
+	if (_4th.type == BRACKET && _4th.str == "[") {
+		Branch array_sz;
+		array_sz.type = ARRAY_INDEX;
+		array_sz.line = _4th.line;
+		array_sz.column = _4th.column;
+		std::string sz_val = "0";
+		if (_5th.type == NUM) {
+			sz_val = _5th.str;
+		}
+		array_sz.str = sz_val;
+		branch.branch_list.push_back(array_sz);
+	}
+
+
+	int right_side_start_at = 0;
+	for (int i = start_pos; i <= end_pos; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		if (v.type == OPERATOR && v.str == "=") {
+			right_side_start_at = i + 1;
+		}
+	}
+
+
 	Branch right_side_start = grouped_token_list
-	                          .branch_list[start_pos + 5];
+	                          .branch_list[right_side_start_at];
 	Branch right_side;
 	right_side.type = RIGHT_SIDE_TEMP;
 	right_side.line = right_side_start.line;
 	right_side.column = right_side_start.column;
-	for (int i = start_pos + 5; i <= end_pos; i++) {
+	for (int i = right_side_start_at; i <= end_pos; i++) {
 		Branch v = grouped_token_list.branch_list[i];
 		right_side.branch_list.push_back(v);
 	}
