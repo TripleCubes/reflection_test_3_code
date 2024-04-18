@@ -3,7 +3,20 @@
 #include "../types.h"
 #include "shared.h"
 
-void group_by_operator(Branch &bracket, const std::string &op_str) {
+namespace {
+bool is_in_list(const std::vector<std::string> &op_str_list,
+const std::string &str) {
+	for (int i = 0; i < (int)op_str_list.size(); i++) {
+		if (str == op_str_list[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+}
+
+void group_by_operator(Branch &bracket,
+const std::vector<std::string> &op_str_list) {
 	if (get_bracket_size(bracket) == 0) {
 		return;
 	}
@@ -11,7 +24,7 @@ void group_by_operator(Branch &bracket, const std::string &op_str) {
 	for (int i = 0; i < get_bracket_size(bracket); i++) {
 		Branch &v = bracket.branch_list[i];
 		if (is_bracket_type(v.type)) {
-			group_by_operator(v, op_str);
+			group_by_operator(v, op_str_list);
 		}
 	}
 
@@ -24,7 +37,7 @@ void group_by_operator(Branch &bracket, const std::string &op_str) {
 			nx = bracket.branch_list[i + 1];
 		}
 
-		if (nx.type == OPERATOR && nx.str == op_str) {
+		if (nx.type == OPERATOR && is_in_list(op_str_list, nx.str)) {
 			Branch grouped;
 			grouped.type = BRACKET_ROUND;
 			grouped.line = v.line;
@@ -40,6 +53,7 @@ void group_by_operator(Branch &bracket, const std::string &op_str) {
 			}
 
 			branch_add(bracket, i, grouped);
+			i--;
 		}
 		
 		i++;

@@ -67,6 +67,7 @@ std::string to_str(BranchType branch_type) {
 	case BRACKET_ARGUMENT: return "BRACKET_ARGUMENT"; break;
 
 	case REVERSE_SIGN: return "REVERSE_SIGN"; break;
+	case REVERSE_COND: return "REVERSE_COND"; break;
 
 	case CALC_START: return "CALC_START"; break;
 	case CALC: return "CALC"; break;

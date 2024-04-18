@@ -47,6 +47,7 @@ enum BranchType: int {
 	BRACKET_ARGUMENT,
 
 	REVERSE_SIGN,
+	REVERSE_COND,
 
 	CALC_START,
 	CALC,
