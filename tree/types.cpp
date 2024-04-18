@@ -50,6 +50,8 @@ std::string to_str(BranchType branch_type) {
 	case FOR_ITER_CONDITIONS_TEMP:
 		return "FOR_ITER_CONDITIONS_TEMP";
 		break;
+	case FUNCNEW_ARGV_TEMP: return "FUNCNEW_ARGV_TEMP"; break;
+	case RETURN_TYPES_TEMP: return "RETURN_TYPES_TEMP"; break;
 
 //	case RIGHT_SIDE: return "RIGHT_SIDE"; break;
 	case VAR_TYPE: return "VAR_TYPE"; break;
@@ -75,6 +77,7 @@ std::string to_str(BranchType branch_type) {
 	case ARRAY_INDEX: return "ARRAY_INDEX"; break;
 	case TYPE_MEMBER: return "TYPE_MEMBER"; break;
 	case TYPE_MEMBER_LIST: return "TYPE_MEMBER_LIST"; break;
+	case FUNCNEW_ARGUMENT: return "FUNCNEW_ARGUMENT"; break;
 
 	case RETURN: return "RETURN"; break;
 	case BREAK: return "BREAK"; break;

@@ -118,17 +118,16 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch var_type_token = grouped_token_list
 	                        .branch_list[start_pos + 3];
 	var_type_token.type = VAR_TYPE;
-	branch.branch_list.push_back(var_type_token);
-
 
 	Branch plus_4 = grouped_token_list.branch_list[start_pos + 4];
 	if (plus_4.type == BRACKET && plus_4.str == "[") {
-		Branch array_sz;
-		array_sz.type = ARRAY_INDEX;
-		array_sz.line = plus_4.line;
-		array_sz.column = plus_4.column;
-		branch.branch_list.push_back(array_sz);
+		Branch array_index;
+		array_index.type = ARRAY_INDEX;
+		array_index.line = plus_4.line;
+		array_index.column = plus_4.column;
+		var_type_token.branch_list.push_back(array_index);
 	}
+	branch.branch_list.push_back(var_type_token);
 
 
 	int right_side_start_at = 0;
@@ -221,6 +220,86 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	branch.branch_list.push_back(bracket_group);
 }
 
+void to_funcnew_argv(Branch &funcnew_argv,
+const Branch &funcnew_argv_temp) {
+	int start_pos = 0;
+
+	auto type_finished = [&start_pos,
+	&funcnew_argv_temp, &funcnew_argv](int end_pos) -> void {
+		Branch start_token = funcnew_argv_temp.branch_list[start_pos];
+		Branch argument;
+		argument.type = FUNCNEW_ARGUMENT;
+		argument.line = start_token.line;
+		argument.column = start_token.column;
+		argument.branch_list.push_back(start_token);
+
+		Branch plus_2 = funcnew_argv_temp.branch_list[start_pos + 2];
+		Branch plus_3;
+		if (start_pos + 3 < (int)funcnew_argv_temp.branch_list.size()){
+			plus_3 = funcnew_argv_temp.branch_list[start_pos + 3];
+		}
+		Branch type;
+		type.type = VAR_TYPE;
+		type.line = plus_2.line;
+		type.column = plus_2.column;
+		type.str = plus_2.str;
+		if (plus_3.type == BRACKET && plus_3.str == "[") {
+			Branch array_index;
+			array_index.type = ARRAY_INDEX;
+			array_index.line = plus_3.line;
+			array_index.column = plus_3.column;
+			type.branch_list.push_back(array_index);
+		}
+		argument.branch_list.push_back(type);
+
+		funcnew_argv.branch_list.push_back(argument);
+	};
+
+	for (int i = 0; i < (int)funcnew_argv_temp.branch_list.size();i++){
+		Branch v = funcnew_argv_temp.branch_list[i];
+		if (v.str == ",") {
+			type_finished(i - 1);
+			start_pos = i + 1;
+		}
+	}
+
+	type_finished((int)funcnew_argv_temp.branch_list.size() - 1);
+}
+
+void to_return_types(Branch &return_types,
+const Branch &return_types_temp) {
+	int start_pos = 0;
+
+	auto type_finished = [&start_pos,
+	&return_types_temp, &return_types](int end_pos) -> void {
+		Branch start_token = return_types_temp.branch_list[start_pos];
+		Branch type;
+		type.type = VAR_TYPE;
+		type.line = start_token.line;
+		type.column = start_token.column;
+		type.str = start_token.str;
+		if (end_pos != start_pos) {
+			Branch plus_1 = return_types_temp.branch_list[start_pos+1];
+			Branch array_index;
+			array_index.type = ARRAY_INDEX;
+			array_index.line = plus_1.line;
+			array_index.column = plus_1.column;
+			type.branch_list.push_back(array_index);
+		}
+		return_types.branch_list.push_back(type);
+	};
+
+	for (int i = 0; i < (int)return_types_temp.branch_list.size();i++){
+		Branch v = return_types_temp.branch_list[i];
+		if (v.str == ",") {
+			type_finished(i - 1);
+			start_pos = i + 1;
+		}
+	}
+
+	type_finished((int)return_types_temp.branch_list.size() - 1);
+}
+
 void new_branch_funcnew(Branch &branch,
 const Branch &grouped_token_list, int start_pos, int end_pos) {
 	int argv_start = start_pos + 3;
@@ -242,7 +321,25 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 		if (i + 1 <= end_pos) {
 			nx_token = grouped_token_list.branch_list[i + 1];
 		}
-		if (is_return_type(token) && nx_token.str != ",") {
+		
+		bool cond = false;
+		if (is_return_type(token) && nx_token.str == "[") {
+			cond = true;
+		}
+		else if (token.str == "[" && nx_token.str == "]") {
+			cond = true;
+		}
+		else if (token.str == "]" && nx_token.str == ",") {
+			cond = true;
+		}
+		else if (token.str == "," && is_return_type(nx_token)) {
+			cond = true;
+		}
+		else if (is_return_type(token) && nx_token.str == ",") {
+			cond = true;
+		}
+
+		if (!cond) {
 			return_type_end = i;
 			break;
 		}
@@ -260,25 +357,25 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch token_code_block_start
 	       = grouped_token_list.branch_list[return_type_end + 1];
 
-	Branch funcnew_argv;
-	funcnew_argv.type = FUNCNEW_ARGV;
-	funcnew_argv.line = token_argv_start.line;
-	funcnew_argv.column = token_argv_start.column;
+	Branch funcnew_argv_temp;
+	funcnew_argv_temp.type = FUNCNEW_ARGV_TEMP;
+	funcnew_argv_temp.line = token_argv_start.line;
+	funcnew_argv_temp.column = token_argv_start.column;
 	for (int i = argv_start; i <= argv_end; i++) {
 		Branch token = grouped_token_list.branch_list[i];
-		funcnew_argv.branch_list.push_back(token);
+		funcnew_argv_temp.branch_list.push_back(token);
 	}
-	branch.branch_list.push_back(funcnew_argv);
+	branch.branch_list.push_back(funcnew_argv_temp);
 
-	Branch return_types;
-	return_types.type = RETURN_TYPES;
-	return_types.line = token_return_type_start.line;
-	return_types.column = token_return_type_start.column;
+	Branch return_types_temp;
+	return_types_temp.type = RETURN_TYPES_TEMP;
+	return_types_temp.line = token_return_type_start.line;
+	return_types_temp.column = token_return_type_start.column;
 	for (int i = return_type_start; i <= return_type_end; i++) {
 		Branch token = grouped_token_list.branch_list[i];
-		return_types.branch_list.push_back(token);
+		return_types_temp.branch_list.push_back(token);
 	}
-	branch.branch_list.push_back(return_types);
+	branch.branch_list.push_back(return_types_temp);
 
 	Branch code_block;
 	code_block.type = CODE_BLOCK;
@@ -287,6 +384,21 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	to_command_list(code_block, grouped_token_list,
 	return_type_end + 1, end_pos - 1);
 	branch.branch_list.push_back(code_block);
+
+
+	Branch funcnew_argv;
+	funcnew_argv.type = FUNCNEW_ARGV;
+	funcnew_argv.line = funcnew_argv_temp.line;
+	funcnew_argv.column = funcnew_argv_temp.column;
+	to_funcnew_argv(funcnew_argv, funcnew_argv_temp);
+	branch.branch_list.push_back(funcnew_argv);
+
+	Branch return_types;
+	return_types.type = RETURN_TYPES;
+	return_types.line = return_types_temp.line;
+	return_types.column = return_types_temp.column;
+	to_return_types(return_types, return_types_temp);
+	branch.branch_list.push_back(return_types);
 }
 
 void new_branch_if(Branch &branch,

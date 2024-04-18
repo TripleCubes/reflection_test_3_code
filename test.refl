@@ -1,3 +1,8 @@
-if not a == b and c == d then
-	print('aaaa')
+type Vec2 {
+	x: number = 0,
+	y: number = 0,
+}
+
+fn vecnew(x: number, y: number[]) -> Vec2, Vec2[]
+	return {x, y}
 end

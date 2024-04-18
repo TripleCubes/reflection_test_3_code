@@ -27,12 +27,17 @@ void to_grouped_token_list(Branch &result, const Branch &token_list) {
 		if (i + 1 < (int)token_list.branch_list.size()) {
 			nx_token = token_list.branch_list[i + 1];
 		}
+		Branch nx_nx_token;
+		if (i + 2 < (int)token_list.branch_list.size()) {
+			nx_nx_token = token_list.branch_list[i + 2];
+		}
 
 		if (!grouping) {
 			if (token.type == NAME && nx_token.str == ".") {
 				grouping = true;
 			}
-			else if (token.type == NAME && nx_token.str == "[") {
+			else if (token.type == NAME && nx_token.str == "["
+			&& nx_nx_token.type == NUM) {
 				grouping = true;
 			}
 			else {
