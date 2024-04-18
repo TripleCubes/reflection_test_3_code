@@ -593,6 +593,31 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 		content_start, content_end);
 	branch.branch_list.push_back(content);
 }
+
+void new_branch_return(Branch &branch,
+const Branch &grouped_token_list, int start_pos, int end_pos) {
+	if (start_pos == end_pos) {
+		return;
+	}
+
+	Branch right_side_start
+	       = grouped_token_list.branch_list[start_pos + 1];
+	Branch right_side;
+	right_side.type = RIGHT_SIDE_TEMP;
+	right_side.line = right_side_start.line;
+	right_side.column = right_side_start.column;
+	for (int i = start_pos + 1; i <= end_pos; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		right_side.branch_list.push_back(v);
+	}
+
+	Branch bracket_group;
+	bracket_group.type = BRACKET_ROUND;
+	bracket_group.line = right_side.line;
+	bracket_group.column = right_side.column;
+	to_calc_tree(bracket_group, right_side);
+	branch.branch_list.push_back(bracket_group);
+}
 }
 
 void to_command_list(Branch &result, const Branch &grouped_token_list,
@@ -637,6 +662,11 @@ int start_pos, int end_pos) {
 		} else if (command_type == TYPE) {
 			new_branch_type(new_branch, grouped_token_list,
 			command_start_pos, command_end_pos);
+		} else if (command_type == RETURN) {
+			new_branch_return(new_branch, grouped_token_list,
+			command_start_pos, command_end_pos);
+		} else if (command_type == BREAK) {
+		} else if (command_type == CONTINUE) {
 		}
 
 		result.branch_list.push_back(new_branch);
@@ -699,6 +729,18 @@ int start_pos, int end_pos) {
 				curly_count = 0;
 				command_type = TYPE;
 			}
+			else if (token.str == "return") {
+				command_start_pos = i;
+				command_type = RETURN;
+			}
+			else if (token.str == "break") {
+				command_start_pos = i;
+				command_type = BREAK;
+			}
+			else if (token.str == "continue") {
+				command_start_pos = i;
+				command_type = CONTINUE;
+			}
 		}
 		if (command_type == VARNEW) {
 			if (right_side_end(token, nx_token)) {
@@ -747,6 +789,21 @@ int start_pos, int end_pos) {
 			if (curly_bracket_block_end(token, curly_count)) {
 				command_finished(i);
 			}
+		}
+		if (command_type == RETURN) {
+			if (right_side_end(token, nx_token)) {
+				command_finished(i);
+			}
+			else if (token.str == "return"
+			&& (nx_token.type == NAME || nx_token.type == KEYWORD)){
+				command_finished(i);
+			}
+		}
+		if (command_type == BREAK) {
+			command_finished(i);
+		}
+		if (command_type == CONTINUE) {
+			command_finished(i);
 		}
 	}
 

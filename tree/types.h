@@ -54,6 +54,10 @@ enum BranchType: int {
 	ARRAY_INDEX,
 	TYPE_MEMBER,
 	TYPE_MEMBER_LIST,
+
+	RETURN,
+	CONTINUE,
+	BREAK,
 };
 
 std::string to_str(BranchType branch_type);

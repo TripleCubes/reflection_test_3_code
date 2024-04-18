@@ -75,6 +75,10 @@ std::string to_str(BranchType branch_type) {
 	case TYPE_MEMBER: return "TYPE_MEMBER"; break;
 	case TYPE_MEMBER_LIST: return "TYPE_MEMBER_LIST"; break;
 
+	case RETURN: return "RETURN"; break;
+	case BREAK: return "BREAK"; break;
+	case CONTINUE: return "CONTINUE"; break;
+
 	default: return "UNHANDLED"; break;
 	}
 
