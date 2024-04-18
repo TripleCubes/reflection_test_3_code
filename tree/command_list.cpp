@@ -103,17 +103,11 @@ const Branch& grouped_token_list, int start_pos, int end_pos) {
 
 
 	Branch _4th = grouped_token_list.branch_list[start_pos + 4];
-	Branch _5th = grouped_token_list.branch_list[start_pos + 5];
 	if (_4th.type == BRACKET && _4th.str == "[") {
 		Branch array_sz;
 		array_sz.type = ARRAY_INDEX;
 		array_sz.line = _4th.line;
 		array_sz.column = _4th.column;
-		std::string sz_val = "0";
-		if (_5th.type == NUM) {
-			sz_val = _5th.str;
-		}
-		array_sz.str = sz_val;
 		branch.branch_list.push_back(array_sz);
 	}
 
