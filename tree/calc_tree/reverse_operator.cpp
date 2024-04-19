@@ -4,8 +4,7 @@
 #include "shared.h"
 #include <iostream>
 
-void reverse_operator(Branch &bracket, const std::string &op,
-BranchType reversed_type) {
+void reverse_operator(Branch &bracket, const std::string &op) {
 	if (get_bracket_size(bracket) == 0) {
 		return;
 	}
@@ -13,7 +12,7 @@ BranchType reversed_type) {
 	for (int i = 0; i < get_bracket_size(bracket); i++) {
 		Branch &v = bracket.branch_list[i];
 		if (is_bracket_type(v.type)) {
-			reverse_operator(v, op, reversed_type);
+			reverse_operator(v, op);
 		}
 	}
 
@@ -33,10 +32,11 @@ BranchType reversed_type) {
 		&& v.str == op && nx.type != NONE
 		&& nx.type != OPERATOR) {
 			Branch reversed;
-			reversed.type = reversed_type;
+			reversed.type = REVERSED;
 			reversed.line = v.line;
 			reversed.column = v.column;
 			reversed.branch_list.push_back(nx);
+			reversed.branch_list.push_back(v);
 			branch_add(bracket, i + 2, reversed);
 			branch_rm(bracket, i + 1);
 			branch_rm(bracket, i);

@@ -3,6 +3,12 @@ type Vec2 {
 	y: number = 0,
 }
 
-fn vecnew(x: number, y: number[]) -> Vec2, Vec2[]
-	return {x, y}
+fn aaa(x: number, y: number[]) -> Vec2, Vec2[]
+	while a == b and c == d do
+		print(i)
+	end
 end
+
+let a: number = 16 + 9
+a = 16 + 9
+print(10, -20, a + 1)

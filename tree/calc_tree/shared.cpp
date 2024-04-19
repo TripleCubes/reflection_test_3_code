@@ -4,7 +4,8 @@
 
 int get_bracket_size(const Branch &bracket) {
 	int sz = (int)bracket.branch_list.size();
-	if (bracket.type == BRACKET_FUNCCALL) {
+	if (bracket.type == BRACKET_FUNCCALL
+	|| bracket.type == REVERSED) {
 		return sz - 1;
 	}
 	return sz;
@@ -15,7 +16,8 @@ bool is_bracket_type(BranchType type) {
 	|| type == BRACKET_SQUARE
 	|| type == BRACKET_CURLY
 	|| type == BRACKET_FUNCCALL
-	|| type == BRACKET_ARGUMENT) {
+	|| type == BRACKET_ARGUMENT
+	|| type == REVERSED) {
 		return true;
 	}
 	return false;

@@ -5,6 +5,7 @@
 #include "tree/token_list.h"
 #include "tree/grouped_token_list.h"
 #include "tree/command_list.h"
+#include "tree_to_lua/tree_to_lua.h"
 
 int main() {
 	std::string code_str = file_to_str("./test.refl");
@@ -22,5 +23,9 @@ int main() {
 	to_command_list(command_list, grouped_token_list, 0,
 		grouped_token_list.branch_list.size() - 1);
 	print_branch(command_list, 0);
+
+	std::string lua_str;
+	tree_to_lua(lua_str, command_list);
+	std::cout << lua_str << std::endl;
 	return 0;
 }

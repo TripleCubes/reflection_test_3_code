@@ -6,7 +6,6 @@
 struct Branch;
 enum BranchType: int;
 
-void reverse_operator(Branch &bracket, const std::string &op,
-BranchType reversed_type);
+void reverse_operator(Branch &bracket, const std::string &op);
 
 #endif
