@@ -18,4 +18,4 @@ let vec_a: Vec2 = vecnew(10, 10)
 let vec_b: Vec2 = vecnew(20, 20)
 vec_a = vec_b
 let vec_c: Vec2 = vec_a
-added: Vec2 = vecadd(vec_a, vec_b)
+let added: Vec2 = vecadd(vec_a, vec_b)

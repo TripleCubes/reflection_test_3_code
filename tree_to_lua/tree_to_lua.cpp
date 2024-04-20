@@ -205,7 +205,15 @@ void varnew_to_str(std::string &result, const Branch &branch) {
 			if (calc_start_branch.type == BRACKET_CURLY) {
 				result += TYPEDEFL_BEGIN + var_type.str;
 				result += "()";
-			} else {
+			}
+			else if (calc_start_branch.type == NAME
+			&& !is_primitive(var_type.str)) {
+				result += TYPECOPY_BEGIN + var_type.str;
+				result += "(";
+				str_grouped_token(result, calc_start_branch);
+				result += ")";
+			}
+			else {
 				str_bracket(result, v);
 			}
 		}
