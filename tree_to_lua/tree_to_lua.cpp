@@ -2,8 +2,28 @@
 
 #include "../tree/types.h"
 #include "../tree/calc_tree/shared.h"
+#include <vector>
 
 namespace {
+const std::string TYPEDEFL_BEGIN = "default_";
+const std::string TYPECOPY_BEGIN = "copy_";
+const std::string TYPECOPY_PARAM = "copy_v";
+
+struct VarDeclare {
+	std::string var_name;
+	std::string var_type;
+};
+std::vector<VarDeclare> var_declare_list;
+
+std::string get_var_type(const std::string &var_name) {
+	for (int i = 0; i < (int)var_declare_list.size(); i++) {
+		if (var_declare_list[i].var_name == var_name) {
+			return var_declare_list[i].var_type;
+		}
+	}
+	return "not_found";
+}
+
 void code_block_to_str(std::string &result,
 const Branch &code_block, int indent);
 
@@ -56,7 +76,19 @@ void str_bracket(std::string &result, const Branch &bracket) {
 			result += ")";
 		}
 		else if (v.type == BRACKET_ARGUMENT) {
-			str_bracket(result, v);
+			Branch calc_start_content
+			       = v.branch_list[0].branch_list[0];
+			if (calc_start_content.type == NAME) {
+				std::string var_name;
+				str_grouped_token(var_name, calc_start_content);
+
+				result += TYPECOPY_BEGIN
+				+ get_var_type(var_name)
+				+ "(" + var_name + ")";
+			} else {
+				str_bracket(result, v);
+			}
+
 			if (i != get_bracket_size(bracket) - 1) {
 				result += ", ";
 			}
@@ -95,27 +127,51 @@ void str_bracket(std::string &result, const Branch &bracket) {
 }
 
 void varnew_to_str(std::string &result, const Branch &branch) {
+	VarDeclare declare;
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == NAME) {
-			str_grouped_token(result, v);
+			str_grouped_token(declare.var_name, v);
+			result += declare.var_name;
 			result += " = ";
 		}
+		else if (v.type == VAR_TYPE) {
+			str_grouped_token(declare.var_type, v);
+		}
 		else if (v.type == BRACKET_ROUND) {
-			str_bracket(result, v);
+			Branch var_type = branch.branch_list[1];
+			Branch calc_start_branch = v.branch_list[0].branch_list[0];
+			if (calc_start_branch.type == BRACKET_CURLY) {
+				result += TYPEDEFL_BEGIN + var_type.str;
+				result += "()";
+			} else {
+				str_bracket(result, v);
+			}
 		}
 	}
+	var_declare_list.push_back(declare);
 }
 
 void assign_to_str(std::string &result, const Branch &branch) {
+	std::string var_name;
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == NAME) {
-			str_grouped_token(result, v);
+			str_grouped_token(var_name, v);
+			result += var_name;
 			result += " = ";
 		}
 		else if (v.type == BRACKET_ROUND) {
-			str_bracket(result, v);
+			Branch calc_start_branch = v.branch_list[0].branch_list[0];
+			if (calc_start_branch.type == NAME) {
+				std::string var_type = get_var_type(var_name);
+				result += TYPECOPY_BEGIN + var_type;
+				result += "(";
+				str_grouped_token(result, calc_start_branch);
+				result += ")";
+			} else {
+				str_bracket(result, v);
+			}
 		}
 	}
 }
@@ -163,7 +219,7 @@ int indent) {
 			result += '\n';
 			code_block_to_str(result, v, indent + 1);
 			str_indent(result, indent);
-			result += "end";
+			result += "end\n";
 		}
 	}
 }
@@ -264,6 +320,78 @@ int indent) {
 	}
 }
 
+void type_to_str(std::string &result, const Branch &branch,
+int indent) {
+	Branch name;
+	Branch type_member_list;
+	std::vector<std::string> param_list;
+	std::vector<Branch> defl_list;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		Branch v = branch.branch_list[i];
+		if (v.type == NAME) {
+			name = v;
+		}
+		else if (v.type == TYPE_MEMBER_LIST) {
+			type_member_list = v;
+		}
+	}
+
+	for (int i = 0; i < (int)type_member_list.branch_list.size(); i++){
+		Branch v = type_member_list.branch_list[i];
+		Branch name = v.branch_list[0];
+		Branch defl = v.branch_list[3];
+		std::string param;
+		str_grouped_token(param, name);
+		param_list.push_back(param);
+		defl_list.push_back(defl);
+	}
+
+	result += "function " + TYPEDEFL_BEGIN;
+	str_grouped_token(result, name);
+	result += "()\n";
+	str_indent(result, indent + 1);
+	result += "return {\n";
+	for (int i = 0; i < (int)param_list.size(); i++) {
+		const std::string &param = param_list[i];
+		const Branch &defl = defl_list[i];
+		str_indent(result, indent + 2);
+		result += param + " = ";
+		str_bracket(result, defl);
+		result += ",\n";
+	}
+	str_indent(result, indent + 1);
+	result += "}\n";
+	str_indent(result, indent);
+	result += "end\n\n";
+
+	str_indent(result, indent);
+	result += "function " + TYPECOPY_BEGIN;
+	str_grouped_token(result, name);
+	result += "(" + TYPECOPY_PARAM + ")\n";
+	str_indent(result, indent + 1);
+	result += "return {\n";
+	for (int i = 0; i < (int)param_list.size(); i++) {
+		const std::string &param = param_list[i];
+		str_indent(result, indent + 2);
+		result += param + " = " + TYPECOPY_PARAM + "." + param + ",\n";
+	}
+	str_indent(result, indent + 1);
+	result += "}\n";
+	str_indent(result, indent);
+	result += "end\n";
+}
+
+void return_to_str(std::string &result, const Branch &branch) {
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		Branch v = branch.branch_list[i];
+		if (v.type == BRACKET_ROUND) {
+			result += "return ";
+			str_bracket(result, v);
+		}
+	}
+}
+
 void code_block_to_str(std::string &result,
 const Branch &code_block, int indent) {
 	for (int i = 0; i < (int)code_block.branch_list.size(); i++) {
@@ -304,6 +432,18 @@ const Branch &code_block, int indent) {
 		}
 		else if (v.type == WHILE) {
 			while_to_str(result, v, indent);
+		}
+		else if (v.type == TYPE) {
+			type_to_str(result, v, indent);
+		}
+		else if (v.type == RETURN) {
+			return_to_str(result, v);
+		}
+		else if (v.type == BREAK) {
+			result += "break";
+		}
+		else if (v.type == CONTINUE) {
+			result += "continue";
 		}
 
 		result += '\n';

@@ -673,7 +673,17 @@ const Branch &grouped_token_list, int content_start, int content_end) {
 
 	for (int i = content_start; i <= content_end; i++) {
 		Branch v = grouped_token_list.branch_list[i];
-		if (v.type == OPERATOR && v.str == ",") {
+		Branch nx;
+		if (i + 1 <= content_end) {
+			nx = grouped_token_list.branch_list[i + 1];
+		}
+		Branch nx_nx;
+		if (i + 2 <= content_end) {
+			nx_nx = grouped_token_list.branch_list[i + 2];
+		}
+
+		if (v.type == OPERATOR && v.str == ","
+		&& (nx.str == "}" || nx_nx.str == ":")) {
 			member_finished(i - 1);
 			start = i + 1;
 		}
@@ -791,6 +801,10 @@ int start_pos, int end_pos) {
 		if (i + 1 < (int)grouped_token_list.branch_list.size()) {
 			nx_token = grouped_token_list.branch_list[i + 1];
 		}
+		Branch nx_nx_token;
+		if (i + 2 < (int)grouped_token_list.branch_list.size()) {
+			nx_nx_token = grouped_token_list.branch_list[i + 2];
+		}
 
 		if (command_type == NONE) {
 			if (token.str == "let") {
@@ -904,7 +918,8 @@ int start_pos, int end_pos) {
 				command_finished(i);
 			}
 			else if (token.str == "return"
-			&& (nx_token.type == NAME || nx_token.type == KEYWORD)){
+			&& (nx_token.type == NAME || nx_token.type == KEYWORD)
+			&& nx_nx_token.str != "(") {
 				command_finished(i);
 			}
 		}

@@ -1,14 +1,17 @@
 type Vec2 {
-	x: number = 0,
-	y: number = 0,
+	x: number = 10 + 3,
+	y: number = 0 + - up(down(a, 2), 8),
 }
 
 fn aaa(x: number, y: number[]) -> Vec2, Vec2[]
 	while a == b and c == d do
+		continue
 		print(i)
+		break
 	end
+	return varnew(10, 10)
 end
 
-let a: number = 16 + 9
-a = 16 + 9
-print(10, -20, a + 1)
+let a: Vec2 = {}
+a = x
+print(a, 10, -20, a + 1)
