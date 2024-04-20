@@ -1,6 +1,7 @@
 #include "command_list.h"
 
 #include "types.h"
+#include "var_types.h"
 #include "calc_tree.h"
 #include <string>
 
@@ -76,37 +77,6 @@ bool curly_bracket_block_end(const Branch &token, int &curly_count) {
 
 	return false;
 }
-
-bool is_return_type(const Branch &token) {
-	if (token.type == NAME) {
-		return true;
-	}
-
-	if (token.type != KEYWORD) {
-		return false;
-	}
-
-	if (token.str == "number"
-	|| token.str == "string"
-	|| token.str == "bool"
-	|| token.str == "void") {
-		return true;
-	}
-
-	return false;
-}
-
-//bool is_var_type(const Branch &token) {
-//	if (!is_return_type(token)) {
-//		return false;
-//	}
-//
-//	if (token.str == "void") {
-//		return false;
-//	}
-//
-//	return true;
-//}
 
 void new_branch_varnew(Branch &branch,
 const Branch &grouped_token_list, int start_pos, int end_pos) {
@@ -801,9 +771,9 @@ int start_pos, int end_pos) {
 		if (i + 1 < (int)grouped_token_list.branch_list.size()) {
 			nx_token = grouped_token_list.branch_list[i + 1];
 		}
-		Branch nx_nx_token;
-		if (i + 2 < (int)grouped_token_list.branch_list.size()) {
-			nx_nx_token = grouped_token_list.branch_list[i + 2];
+		Branch prev_token;
+		if (i - 1 >= 0) {
+			prev_token = grouped_token_list.branch_list[i - 1];
 		}
 
 		if (command_type == NONE) {
@@ -917,9 +887,9 @@ int start_pos, int end_pos) {
 			if (right_side_end(token, nx_token)) {
 				command_finished(i);
 			}
-			else if (token.str == "return"
-			&& (nx_token.type == NAME || nx_token.type == KEYWORD)
-			&& nx_nx_token.str != "(") {
+			else if (prev_token.str == "return"
+			&& (token.type == NAME || token.type == KEYWORD)
+			&& nx_token.str != "(") {
 				command_finished(i);
 			}
 		}

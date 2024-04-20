@@ -14,7 +14,9 @@ bool is_temp(BranchType type) {
 	if (type == RIGHT_SIDE_TEMP
 	|| type == ARGV_TEMP
 	|| type == CONDITIONS_TEMP
-	|| type == FOR_ITER_CONDITIONS_TEMP) {
+	|| type == FOR_ITER_CONDITIONS_TEMP
+	|| type == FUNCNEW_ARGV_TEMP
+	|| type == RETURN_TYPES_TEMP) {
 		return true;
 	}
 	return false;

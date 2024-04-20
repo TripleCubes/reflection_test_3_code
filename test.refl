@@ -1,17 +1,21 @@
 type Vec2 {
-	x: number = 10 + 3,
-	y: number = 0 + - up(down(a, 2), 8),
+	x: number = 0,
+	y: number = 0,
 }
 
-fn aaa(x: number, y: number[]) -> Vec2, Vec2[]
-	while a == b and c == d do
-		continue
-		print(i)
-		break
-	end
-	return varnew(10, 10)
+fn vecnew(x: number, y: number) -> Vec2
+	let vec: Vec2 = {}
+	vec.x = x
+	vec.y = y
+	return vec
 end
 
-let a: Vec2 = {}
-a = x
-print(a, 10, -20, a + 1)
+fn vecadd(veca: Vec2, vecb: Vec2) -> Vec2
+	return vecnew(veca.x + vecb.x, veca.y + vecb.y)
+end
+
+let vec_a: Vec2 = vecnew(10, 10)
+let vec_b: Vec2 = vecnew(20, 20)
+vec_a = vec_b
+let vec_c: Vec2 = vec_a
+added: Vec2 = vecadd(vec_a, vec_b)
