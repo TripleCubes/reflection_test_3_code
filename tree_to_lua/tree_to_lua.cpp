@@ -3,87 +3,16 @@
 #include "../tree/types.h"
 #include "../tree/calc_tree/shared.h"
 #include "../tree/var_types.h"
+#include "../type_checker/var_check.h"
 #include <vector>
-#include <iostream>
 
 namespace {
 const std::string TYPEDEFL_BEGIN = "default_";
 const std::string TYPECOPY_BEGIN = "copy_";
 const std::string TYPECOPY_PARAM = "copy_v";
 
-struct VarDeclare {
-	std::string var_name;
-	std::string var_type;
-};
 std::vector<VarDeclare> var_declare_list;
-
-struct TypeDeclare {
-	std::string type_name;
-	std::vector<VarDeclare> member_list;
-};
 std::vector<TypeDeclare> type_declare_list;
-
-std::string get_var_type(const std::string &var_name) {
-	for (int i = 0; i < (int)var_declare_list.size(); i++) {
-		if (var_declare_list[i].var_name == var_name) {
-			return var_declare_list[i].var_type;
-		}
-	}
-	return "";
-}
-
-int get_type_declare_i(const std::string &type_name) {
-	for (int i = 0; i < (int)type_declare_list.size(); i++) {
-		if (type_declare_list[i].type_name == type_name) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-void add_var_declare(VarDeclare declare) {
-	var_declare_list.push_back(declare);
-
-	int index = get_type_declare_i(declare.var_type);
-	if (index == -1) {
-		return;
-	}
-
-	const TypeDeclare &type_declare
-	                  = type_declare_list[index];
-	for (int i = 0; i < (int)type_declare.member_list.size(); i++) {
-		const VarDeclare &member
-		                 = type_declare.member_list[i];
-		VarDeclare new_var_declare;
-		new_var_declare.var_name = declare.var_name
-		                           + "." + member.var_name;
-		new_var_declare.var_type = member.var_type;
-		add_var_declare(new_var_declare);
-	}
-}
-
-void print_declare_lists() {
-	std::cout << "----" << std::endl;
-	for (int i = 0; i < (int)type_declare_list.size(); i++) {
-		TypeDeclare v = type_declare_list[i];
-		std::cout << v.type_name << std::endl;
-		for (int j = 0; j < (int)v.member_list.size(); j++) {
-			VarDeclare vv = v.member_list[j];
-			std::cout << "    "
-			          << vv.var_name
-			          << " " << vv.var_type << std::endl;
-		}
-	}
-
-	std::cout << std::endl;
-
-	for (int i = 0; i < (int)var_declare_list.size(); i++) {
-		VarDeclare v = var_declare_list[i];
-		std::cout << v.var_name << " " << v.var_type << std::endl;
-	}
-	std::cout << "----" << std::endl;
-}
-
 
 void code_block_to_str(std::string &result,
 const Branch &code_block, int indent);
@@ -144,7 +73,7 @@ void str_bracket(std::string &result, const Branch &bracket) {
 				str_grouped_token(var_name, calc_start_content);
 
 				result += TYPECOPY_BEGIN
-				+ get_var_type(var_name)
+				+ get_var_type(var_declare_list, var_name)
 				+ "(" + var_name + ")";
 			} else {
 				str_bracket(result, v);
@@ -218,7 +147,7 @@ void varnew_to_str(std::string &result, const Branch &branch) {
 			}
 		}
 	}
-	add_var_declare(declare);
+	add_var_declare(var_declare_list, type_declare_list, declare);
 }
 
 void assign_to_str(std::string &result, const Branch &branch) {
@@ -232,7 +161,8 @@ void assign_to_str(std::string &result, const Branch &branch) {
 		}
 		else if (v.type == BRACKET_ROUND) {
 			Branch calc_start_branch = v.branch_list[0].branch_list[0];
-			std::string var_type = get_var_type(var_name);
+			std::string var_type 
+			            = get_var_type(var_declare_list, var_name);
 			if (calc_start_branch.type == NAME
 			&& !is_primitive(var_type)) {
 				result += TYPECOPY_BEGIN + var_type;
@@ -534,5 +464,5 @@ const Branch &code_block, int indent) {
 
 void tree_to_lua(std::string &result, const Branch &tree) {
 	code_block_to_str(result, tree, 0);
-	print_declare_lists();
+	print_declare_lists(var_declare_list, type_declare_list);
 }
