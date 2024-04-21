@@ -18,4 +18,4 @@ fn test(vec: Vec2) -> void
 	print(vec.x .. " " .. vec.y)
 end
 
-test(c.b)
+test(c.b[0].a[1])
