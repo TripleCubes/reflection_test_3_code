@@ -9,14 +9,11 @@ type Vec3 {
 	z: number = 0,
 }
 
-fn a(m: Vec2) -> void
+fn a() -> void
 	let y: Vec2 = x
 end
 
-fn b(m: number) -> void
+fn b() -> void
 	let x: Vec3 = {}
 	let y: Vec3 = x
 end
-
-let l: Vec2 = {}
-a(l)

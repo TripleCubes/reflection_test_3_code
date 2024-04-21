@@ -192,6 +192,10 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 
 void to_funcnew_argv(Branch &funcnew_argv,
 const Branch &funcnew_argv_temp) {
+	if ((int)funcnew_argv_temp.branch_list.size() == 0) {
+		return;
+	}
+
 	int start_pos = 0;
 
 	auto type_finished = [&start_pos,
