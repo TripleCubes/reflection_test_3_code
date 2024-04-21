@@ -56,6 +56,7 @@ void str_bracket(std::string &result, const Branch &bracket) {
 			result += "}";
 		}
 		else if (v.type == BRACKET_FUNCCALL) {
+			if (i != 0) { result += " "; }
 			int sz = (int)v.branch_list.size();
 			Branch last = v.branch_list[sz - 1];
 			
@@ -97,6 +98,7 @@ void str_bracket(std::string &result, const Branch &bracket) {
 				result += " ";
 				str_grouped_token(result, second);
 			} else {
+				//result += " ";
 				str_bracket(result, v);
 			}
 		}

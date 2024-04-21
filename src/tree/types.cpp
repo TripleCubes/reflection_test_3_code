@@ -92,7 +92,8 @@ std::string to_str(BranchType branch_type) {
 
 void print_branch(Branch branch, int indent) {
 	std::string s = spaces(indent * 4);
-	std::cout << s << to_str(branch.type) << std::endl;
+	std::cout << s << to_str(branch.type)
+		<< " " << branch.line << ":" << branch.column << std::endl;
 	
 	if (branch.str != "")
 		std::cout << s << "    " << branch.str << std::endl;

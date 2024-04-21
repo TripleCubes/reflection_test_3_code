@@ -66,14 +66,18 @@ void to_token_list(Branch &result, const std::string &code_str) {
 	std::string str;
 	int line = 1;
 	int column = 1;
+	int prev_line = 1;
+	int prev_column = 0;
 
 	auto token_finish = [&result, &token_type,
-	&str, &line, &column]() -> void {
+	&str, &line, &prev_line, &prev_column, &column]() -> void {
 		Branch branch;
 		branch.type = token_type;
 		branch.str = str;
-		branch.line = line;
-		branch.column = column;
+		branch.line = prev_line;
+		branch.column = prev_column + 1;
+		prev_line = line;
+		prev_column = column;
 
 		if (is_keyword(str)) {
 			branch.type = KEYWORD;

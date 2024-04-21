@@ -3,6 +3,7 @@
 #include "types.h"
 #include "var_types.h"
 #include "calc_tree.h"
+#include "../parse_checker/parse_checker.h"
 #include <string>
 
 namespace {
@@ -721,6 +722,9 @@ int start_pos, int end_pos) {
 
 	auto command_finished = [&grouped_token_list, &command_type,
 	&command_start_pos, &result](int command_end_pos) -> void {
+		parse_check(grouped_token_list, command_type,
+			command_start_pos, command_end_pos);
+
 		Branch start_token = grouped_token_list
 		                     .branch_list[command_start_pos];
 			

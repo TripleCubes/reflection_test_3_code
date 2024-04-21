@@ -14,7 +14,8 @@ bool is_return_type(const Branch &token) {
 	if (token.str == "number"
 	|| token.str == "string"
 	|| token.str == "bool"
-	|| token.str == "void") {
+	|| token.str == "void"
+	|| token.str == "fn") {
 		return true;
 	}
 
