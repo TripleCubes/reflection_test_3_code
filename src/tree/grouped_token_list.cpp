@@ -60,6 +60,9 @@ void to_grouped_token_list(Branch &result, const Branch &token_list) {
 			&& (nx_token.type == NAME || nx_token.type == NUM)) {
 				grouped_list.push_back(token);
 			}
+			else if (token.str == "]" && nx_token.str == ".") {
+				grouped_list.push_back(token);
+			}
 			else {
 				grouped_list.push_back(token);
 				grouping_finished();

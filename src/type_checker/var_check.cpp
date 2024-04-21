@@ -15,6 +15,23 @@ int scope_id, int in_scope_id) {
 	}
 	return false;
 }
+
+std::string replace_arr_index(const std::string &var_name) {
+	std::string result = var_name;
+
+	for (int i = 0; i < (int)result.length(); i++) {
+		char prev = ' ';
+		if (i - 1 >= 0) {
+			prev = result[i - 1];
+		}
+
+		if (prev == '[') {
+			result[i] = '0';
+		}
+	}
+
+	return result;
+}
 }
 
 std::string get_var_type(
@@ -27,7 +44,7 @@ const std::vector<int> &scope_tree, int scope_id) {
 		bool cond = scope_id == -1
 			|| is_in_scope(scope_tree, scope_id, v.scope_id);
 
-		if (v.var_name == var_name && cond) {
+		if (v.var_name == replace_arr_index(var_name) && cond) {
 			return var_declare_list[i].var_type;
 		}
 	}
@@ -51,6 +68,19 @@ const std::vector<TypeDeclare> &type_declare_list,
 VarDeclare declare) {
 	var_declare_list.push_back(declare);
 
+	int var_type_sz = (int)declare.var_type.size();
+	if (declare.var_type[var_type_sz - 1] == ']') {
+		VarDeclare new_var_declare;
+		new_var_declare.var_name = declare.var_name + "[0]";
+		new_var_declare.var_type
+			= declare.var_type.substr(0, var_type_sz - 2);
+		new_var_declare.scope_id = declare.scope_id;
+		add_var_declare(var_declare_list,
+		                type_declare_list,
+		                new_var_declare);
+	}
+
+
 	int index = get_type_declare_i(type_declare_list,declare.var_type);
 	if (index == -1) {
 		return;
@@ -65,6 +95,7 @@ VarDeclare declare) {
 		new_var_declare.var_name = declare.var_name
 		                           + "." + member.var_name;
 		new_var_declare.var_type = member.var_type;
+		new_var_declare.scope_id = declare.scope_id;
 		add_var_declare(var_declare_list,
 		                type_declare_list,
 		                new_var_declare);

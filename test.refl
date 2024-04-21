@@ -3,17 +3,19 @@ type Vec2 {
 	y: number = 0,
 }
 
-type Vec3 {
-	x: number = 0,
-	y: number = 0,
-	z: number = 0,
+type A {
+	a: Vec2[] = [],
+	b: bool = false,
 }
 
-fn a() -> void
-	let y: Vec2 = x
+type B {
+	b: A[] = [],
+}
+
+let c: B = {}
+
+fn test(vec: Vec2) -> void
+	print(vec.x .. " " .. vec.y)
 end
 
-fn b() -> void
-	let x: Vec3 = {}
-	let y: Vec3 = x
-end
+test(c.b)

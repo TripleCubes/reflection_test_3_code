@@ -25,8 +25,13 @@ void str_indent(std::string &result, int indent) {
 }
 
 void str_grouped_token(std::string &result, const Branch &token) {
-	if ((int)token.branch_list.size() == 0) {
+	if (token.str != "") {
 		result += token.str;
+		if ((int)token.branch_list.size() != 0) {
+			if (token.branch_list[0].type == ARRAY_INDEX) {
+				result += "[]";
+			}
+		}
 	} else {
 		for (int i = 0; i < (int)token.branch_list.size(); i++) {
 			Branch v = token.branch_list[i];
@@ -67,17 +72,24 @@ void str_bracket(std::string &result, const Branch &bracket) {
 			result += ")";
 		}
 		else if (v.type == BRACKET_ARGUMENT) {
+			bool cond = false;
 			Branch calc_start_content
 			       = v.branch_list[0].branch_list[0];
 			if (calc_start_content.type == NAME) {
 				std::string var_name;
 				str_grouped_token(var_name, calc_start_content);
+				std::string var_type = get_var_type(
+					var_declare_list, var_name, scope_tree, -1);
 
-				result += TYPECOPY_BEGIN
-				+ get_var_type(var_declare_list, var_name,
-				               scope_tree, -1)
-				+ "(" + var_name + ")";
-			} else {
+				if (!is_primitive(var_type)) {
+					result += TYPECOPY_BEGIN
+					+ var_type
+					+ "(" + var_name + ")";
+					cond = true;
+				}
+			}
+
+			if (!cond) {
 				str_bracket(result, v);
 			}
 

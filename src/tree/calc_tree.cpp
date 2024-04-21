@@ -14,7 +14,7 @@ void to_calc_tree(Branch &result, const Branch &token_list) {
 	reverse_operator(result, "not");
 	func_argv(result);
 	group_by_operator(result, { "*", "/", "//", "%" });
-	group_by_operator(result, { "-", "+" });
+	group_by_operator(result, { "-", "+", ".." });
 	group_by_operator(result, { "==", "~=", ">=", "<=", ">", "<" });
 	bracket_to_calc(result);
 }

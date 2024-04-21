@@ -588,7 +588,7 @@ const Branch &grouped_token_list, int member_start, int member_end) {
 	member.branch_list.push_back(token_name);
 
 	Branch token_type = grouped_token_list.branch_list[member_start+2];
-	member.branch_list.push_back(token_type);
+	token_type.type = VAR_TYPE;
 
 	Branch plus_3 = grouped_token_list.branch_list[member_start + 3];
 	if (plus_3.type == BRACKET && plus_3.str == "[") {
@@ -596,8 +596,9 @@ const Branch &grouped_token_list, int member_start, int member_end) {
 		array_index.type = ARRAY_INDEX;
 		array_index.line = plus_3.line;
 		array_index.column = plus_3.column;
-		member.branch_list.push_back(array_index);
+		token_type.branch_list.push_back(array_index);
 	}
+	member.branch_list.push_back(token_type);
 
 	int right_side_start_at = 0;
 	for (int i = member_start; i <= member_end; i++) {
