@@ -2,11 +2,32 @@
 
 #include <iostream>
 
+namespace {
+bool is_in_scope(const std::vector<int> &scope_tree,
+int scope_id, int in_scope_id) {
+	int checking = scope_id;
+	while (checking != -1) {
+		if (checking == in_scope_id) {
+			return true;
+		}
+
+		checking = scope_tree[checking];
+	}
+	return false;
+}
+}
+
 std::string get_var_type(
 const std::vector<VarDeclare> &var_declare_list,
-const std::string &var_name) {
+const std::string &var_name,
+const std::vector<int> &scope_tree, int scope_id) {
 	for (int i = 0; i < (int)var_declare_list.size(); i++) {
-		if (var_declare_list[i].var_name == var_name) {
+		const VarDeclare &v = var_declare_list[i];
+
+		bool cond = scope_id == -1
+			|| is_in_scope(scope_tree, scope_id, v.scope_id);
+
+		if (v.var_name == var_name && cond) {
 			return var_declare_list[i].var_type;
 		}
 	}
@@ -53,7 +74,6 @@ VarDeclare declare) {
 void print_declare_lists(
 const std::vector<VarDeclare> &var_declare_list,
 const std::vector<TypeDeclare> &type_declare_list) {
-	std::cout << "----" << std::endl;
 	for (int i = 0; i < (int)type_declare_list.size(); i++) {
 		TypeDeclare v = type_declare_list[i];
 		std::cout << v.type_name << std::endl;
@@ -69,7 +89,13 @@ const std::vector<TypeDeclare> &type_declare_list) {
 
 	for (int i = 0; i < (int)var_declare_list.size(); i++) {
 		VarDeclare v = var_declare_list[i];
-		std::cout << v.var_name << " " << v.var_type << std::endl;
+		std::cout << v.var_name << " " << v.var_type
+			<< " " << v.scope_id << std::endl;
 	}
-	std::cout << "----" << std::endl;
+}
+
+void print_scope_tree(const std::vector<int> &scope_tree) {
+	for (int i = 0; i < (int)scope_tree.size(); i++) {
+		std::cout << scope_tree[i] << " <- " << i << std::endl;
+	}
 }

@@ -3,19 +3,20 @@ type Vec2 {
 	y: number = 0,
 }
 
-fn vecnew(x: number, y: number) -> Vec2
-	let vec: Vec2 = {}
-	vec.x = x
-	vec.y = y
-	return vec
+type Vec3 {
+	x: number = 0,
+	y: number = 0,
+	z: number = 0,
+}
+
+fn a(m: Vec2) -> void
+	let y: Vec2 = x
 end
 
-fn vecadd(veca: Vec2, vecb: Vec2) -> Vec2
-	return vecnew(veca.x + vecb.x, veca.y + vecb.y)
+fn b(m: number) -> void
+	let x: Vec3 = {}
+	let y: Vec3 = x
 end
 
-let vec_a: Vec2 = vecnew(10, 10)
-let vec_b: Vec2 = vecnew(20, 20)
-vec_a = vec_b
-let vec_c: Vec2 = vec_a
-let added: Vec2 = vecadd(vec_a, vec_b)
+let l: Vec2 = {}
+a(l)
