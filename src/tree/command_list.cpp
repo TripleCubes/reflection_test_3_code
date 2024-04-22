@@ -584,6 +584,9 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	branch.branch_list.push_back(code_block);
 }
 
+std::string to_lambda_right_side(Branch &lambda_right_side,
+const Branch &right_side);
+
 void to_member(Branch &member,
 const Branch &grouped_token_list, int member_start, int member_end) {
 	Branch token_name = grouped_token_list.branch_list[member_start];
@@ -622,6 +625,20 @@ const Branch &grouped_token_list, int member_start, int member_end) {
 		right_side.branch_list.push_back(v);
 	}
 	member.branch_list.push_back(right_side);
+
+	if (token_type.str == "fn") {
+		Branch var_type_token;
+		Branch lambda_right_side;
+		lambda_right_side.type = LAMBDA_RIGHT_SIDE;
+		lambda_right_side.line = right_side.line;
+		lambda_right_side.column = right_side.column;
+		var_type_token.str
+			= to_lambda_right_side(lambda_right_side, right_side);
+		member.branch_list.push_back(lambda_right_side);
+		member.branch_list.push_back(var_type_token);
+		
+		return;
+	}
 
 	Branch bracket_group;
 	bracket_group.type = BRACKET_ROUND;

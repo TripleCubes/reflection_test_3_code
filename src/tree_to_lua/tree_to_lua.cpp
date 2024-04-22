@@ -285,6 +285,9 @@ int indent) {
 	}
 }
 
+void lambda_to_str(std::string &result, const Branch &branch,
+int indent);
+
 void type_to_str(std::string &result, const Branch &branch,
 int indent) {
 	Branch name;
@@ -341,16 +344,24 @@ int indent) {
 		const std::string &param = param_list[i];
 		const std::string &type = type_list[i];
 		const Branch &defl = defl_list[i];
+		const Branch &member = type_member_list.branch_list[i];
 
 		str_indent(result, indent + 1);
-		result += "a." + param + " = ";
 
 		Branch calc_start_branch = defl.branch_list[0].branch_list[0];
 		if (calc_start_branch.type == BRACKET_CURLY) {
+			result += "a." + param + " = ";
 			result += TYPEDEFL_BEGIN + type + "()";
 		}
 		else {
-			str_bracket(result, defl);
+			if (type == "fn") {
+				result += "a.";
+				lambda_to_str(result, member, indent + 1);
+			}
+			else {
+				result += "a." + param + " = ";
+				str_bracket(result, defl);
+			}
 		}
 		result += "\n";
 	}

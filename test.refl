@@ -6,6 +6,9 @@ type A {
 type B from A {
 	x: number = 3,
 	z: A = {},
+	f: fn = fn(a: number) -> void
+		a = 20
+	end
 }
 
 a[b].c = 10
