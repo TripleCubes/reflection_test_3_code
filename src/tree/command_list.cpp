@@ -920,7 +920,7 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	var_type_token.type = VAR_TYPE;
 
 	Branch lambda_right_side;
-	lambda_right_side.type = BRACKET_ROUND;
+	lambda_right_side.type = LAMBDA_RIGHT_SIDE;
 	lambda_right_side.line = right_side.line;
 	lambda_right_side.column = right_side.column;
 	var_type_token.str

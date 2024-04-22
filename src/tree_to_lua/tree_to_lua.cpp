@@ -3,6 +3,7 @@
 #include "../tree/types.h"
 #include "../tree/calc_tree/shared.h"
 #include <vector>
+#include <iostream>
 
 namespace {
 const std::string TYPEDEFL_BEGIN = "default_";
@@ -369,6 +370,34 @@ void return_to_str(std::string &result, const Branch &branch) {
 	}
 }
 
+void lambda_to_str(std::string &result, const Branch &branch,
+int indent) {
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		Branch v = branch.branch_list[i];
+		if (v.type == NAME) {
+			str_grouped_token(result, v);
+			result += " = function(";
+		}
+		else if (v.type == LAMBDA_RIGHT_SIDE) {
+			const Branch &argv = v.branch_list[2];
+			for (int i = 0; i < (int)argv.branch_list.size(); i++) {
+				const Branch &name=argv.branch_list[i].branch_list[0];
+				str_grouped_token(result, name);
+				if (i != (int)argv.branch_list.size() - 1) {
+					result += ", ";
+				}
+			}
+			result += ")\n";
+
+			const Branch &code_block = v.branch_list[4];
+			code_block_to_str(result, code_block, indent + 1);
+
+			str_indent(result, indent);
+			result += "end\n";
+		}
+	}
+}
+
 void code_block_to_str(std::string &result,
 const Branch &code_block, int indent) {
 	for (int i = 0; i < (int)code_block.branch_list.size(); i++) {
@@ -421,6 +450,12 @@ const Branch &code_block, int indent) {
 		}
 		else if (v.type == CONTINUE) {
 			result += "continue";
+		}
+		else if (v.type == LAMBDA_NEW) {
+			lambda_to_str(result, v, indent);
+		}
+		else if (v.type == LAMBDA_ASSIGN) {
+			lambda_to_str(result, v, indent);
 		}
 
 		result += '\n';
