@@ -5,6 +5,7 @@
 #include "../tree/var_types.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace {
 int sz(int start, int end) {
@@ -12,7 +13,7 @@ int sz(int start, int end) {
 }
 
 bool is_value(const Branch &token) {
-	if (token.type == NAME || token.type == NUM
+	if (token.type == NAME || token.type == NUM || token.type == STR
 	|| token.str == "true" || token.str == "false") {
 		return true;
 	}
@@ -107,8 +108,8 @@ bool f_is_next_to_comma(const Branch &nx) {
 	return false;
 }
 
-void right_side_check(const Branch &token_list, int start, int end) {
-	bool in_funccall = false;
+void right_side_check(const Branch &token_list, int start, int end,
+bool in_funccall) {
 	int f_bracket_count = 0;
 	int bracket_count = 0;
 	for (int i = start; i <= end; i++) {
@@ -220,8 +221,7 @@ void varnew_check(const Branch &token_list, int start, int end) {
 		err_cant_parse(token_list, start);
 	}
 
-	right_side_check(token_list, equal_sign_pos + 1, end);
-}
+	right_side_check(token_list, equal_sign_pos + 1, end, false);
 }
 
 void assign_check(const Branch &token_list, int start, int end) {
@@ -237,7 +237,93 @@ void assign_check(const Branch &token_list, int start, int end) {
 		err_cant_parse(token_list, start + 1);
 	}
 
-	right_side_check(token_list, start + 2, end);
+	right_side_check(token_list, start + 2, end, false);
+}
+
+void funccall_check(const Branch &token_list, int start, int end) {
+	if (sz(start, end) < 3) {
+		err_cant_parse(token_list, start);
+	}
+
+	if (token_list.branch_list[start].type != NAME) {
+		err_cant_parse(token_list, start);
+	}
+
+	if (token_list.branch_list[start + 1].str != "(") {
+		err_cant_parse(token_list, start + 1);
+	}
+
+	if (token_list.branch_list[end].str != ")") {
+		err_cant_parse(token_list, end);
+	}
+
+	right_side_check(token_list, start + 2, end - 1, true);
+}
+
+void argument_list_check(const Branch &token_list, int start, int end){
+	for (int i = start; i <= end; i++) {
+		const Branch &v = token_list.branch_list[i];
+		Branch nx;
+		if (i + 1 <= end) {
+			nx = token_list.branch_list[i + 1];
+		}
+
+		if (v.type == NAME && nx.str != ":") {
+			err_expect_colon(token_list, i);
+		}
+
+		if (v.str == ":" && !is_var_type(nx)) {
+			err_not_a_var_type(token_list, i);
+		}
+
+		if (is_var_type(v) && !(nx.str == ","
+		|| nx.str == "[" || nx.type == NONE)) {
+			err_expect_comma(token_list, i);
+		}
+
+		if (v.str == "[" && nx.str != "]") {
+			err_expect_close_square_bracket(token_list, i);
+		}
+
+		if (v.str == "]" && !(nx.str == ","
+		|| nx.type == NONE)) {
+			err_expect_comma(token_list, i);
+		}
+
+		if (v.str == "," && nx.type != NAME) {
+			err_expect_var_name(token_list, i);
+		}
+	}
+}
+
+void funcnew_check(const Branch &token_list, int start, int end) {
+	if (sz(start, end) < 7) {
+		err_cant_parse(token_list, start);
+	}
+
+	if (token_list.branch_list[start + 1].type != NAME) {
+		err_cant_parse(token_list, start + 1);
+	}
+
+	if (token_list.branch_list[start + 2].str != "(") {
+		err_cant_parse(token_list, start + 2);
+	}
+
+	int bracket_close = 0;
+	for (int i = start + 3; i <= end; i++) {
+		if (i == end) {
+			err_cant_parse(token_list, start);
+		}
+
+		const Branch &v = token_list.branch_list[i];
+		if (v.str == ")") {
+			bracket_close = i;
+			break;
+		}
+	}
+
+	argument_list_check(token_list, start + 3, bracket_close - 1);
+}
 }
 
 void parse_check(const Branch &token_list, BranchType branch_type,
@@ -247,5 +333,11 @@ int start, int end) {
 	}
 	else if (branch_type == ASSIGN) {
 		assign_check(token_list, start, end);
+	}
+	else if (branch_type == FUNCCALL) {
+		funccall_check(token_list, start, end);
+	}
+	else if (branch_type == FUNCNEW) {
+		funcnew_check(token_list, start, end);
 	}
 }

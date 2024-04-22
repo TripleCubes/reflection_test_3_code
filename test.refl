@@ -21,4 +21,7 @@ f = fn(m: string) -> void
 	a = 10
 end
 
+fn a(a, b) -> void
+end
+
 let c: number = 10 * 8

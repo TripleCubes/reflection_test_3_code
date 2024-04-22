@@ -5,7 +5,6 @@
 #include "calc_tree.h"
 #include "../parse_checker/parse_checker.h"
 #include <string>
-#include <iostream>
 
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {

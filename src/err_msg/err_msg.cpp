@@ -104,3 +104,36 @@ void err_not_a_var_type(const Branch &token_list, int pos) {
 	draw_err_pos(token_list, pos, 0);
 	exit(0);
 }
+
+void err_expect_colon(const Branch &token_list, int pos) {
+	const Branch &token = token_list.branch_list[pos];
+	std::cout << token.line << ":" << token.column
+		<< " expected ':'" << std::endl;
+	draw_err_pos(token_list, pos, 0);
+	exit(0);
+}
+
+void err_expect_comma(const Branch &token_list, int pos) {
+	const Branch &token = token_list.branch_list[pos];
+	std::cout << token.line << ":" << token.column
+		<< " expected ','" << std::endl;
+	draw_err_pos(token_list, pos, 0);
+	exit(0);
+}
+
+void err_expect_close_square_bracket(const Branch &token_list,
+int pos) {
+	const Branch &token = token_list.branch_list[pos];
+	std::cout << token.line << ":" << token.column
+		<< " expected ']'" << std::endl;
+	draw_err_pos(token_list, pos, 0);
+	exit(0);
+}
+
+void err_expect_var_name(const Branch &token_list, int pos) {
+	const Branch &token = token_list.branch_list[pos];
+	std::cout << token.line << ":" << token.column
+		<< " expected a var name" << std::endl;
+	draw_err_pos(token_list, pos, 0);
+	exit(0);
+}
