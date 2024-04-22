@@ -5,6 +5,7 @@
 #include "calc_tree.h"
 #include "../parse_checker/parse_checker.h"
 #include <string>
+#include <iostream>
 
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {
@@ -56,11 +57,11 @@ bool code_block_end(const Branch &token, int &code_block_count) {
 	}
 	if (token.str == "end") {
 		code_block_count--;
+		if (code_block_count == 0) {
+			return true;
+		}
 	}
 
-	if (code_block_count == 0) {
-		return true;
-	}
 	return false;
 }
 
@@ -723,6 +724,210 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	to_calc_tree(bracket_group, right_side);
 	branch.branch_list.push_back(bracket_group);
 }
+
+std::string to_lambda_right_side(Branch &lambda_right_side,
+const Branch &right_side) {
+	int argv_start = 2;
+	int argv_end = 0;
+	int return_type_start = 0;
+	int return_type_end = 0;
+	for (int i = 0 ; i < (int)right_side.branch_list.size(); i++) {
+		Branch token = right_side.branch_list[i];
+
+		if (token.str == ")") {
+			argv_end = i - 1;
+			return_type_start = i + 2;
+			break;
+		}
+	}
+	for (int i = return_type_start;
+	i < (int)right_side.branch_list.size(); i+=2) {
+		Branch token = right_side.branch_list[i];
+		Branch nx_token;
+		if (i + 1 < (int)right_side.branch_list.size()) {
+			nx_token = right_side.branch_list[i + 1];
+		}
+		
+		bool cond = false;
+		if (is_return_type(token) && nx_token.str == "[") {
+			cond = true;
+		}
+		else if (token.str == "[" && nx_token.str == "]") {
+			cond = true;
+		}
+		else if (token.str == "]" && nx_token.str == ",") {
+			cond = true;
+		}
+		else if (token.str == "," && is_return_type(nx_token)) {
+			cond = true;
+		}
+		else if (is_return_type(token) && nx_token.str == ",") {
+			cond = true;
+		}
+
+		if (!cond) {
+			return_type_end = i;
+			break;
+		}
+	}
+
+
+	Branch token_argv_start
+	       = right_side.branch_list[argv_start];
+	Branch token_return_type_start
+	       = right_side.branch_list[return_type_start];
+	Branch token_code_block_start
+	       = right_side.branch_list[return_type_end + 1];
+
+	Branch funcnew_argv_temp;
+	funcnew_argv_temp.type = FUNCNEW_ARGV_TEMP;
+	funcnew_argv_temp.line = token_argv_start.line;
+	funcnew_argv_temp.column = token_argv_start.column;
+	for (int i = argv_start; i <= argv_end; i++) {
+		Branch token = right_side.branch_list[i];
+		funcnew_argv_temp.branch_list.push_back(token);
+	}
+	lambda_right_side.branch_list.push_back(funcnew_argv_temp);
+
+	Branch return_types_temp;
+	return_types_temp.type = RETURN_TYPES_TEMP;
+	return_types_temp.line = token_return_type_start.line;
+	return_types_temp.column = token_return_type_start.column;
+	for (int i = return_type_start; i <= return_type_end; i++) {
+		Branch token = right_side.branch_list[i];
+		return_types_temp.branch_list.push_back(token);
+	}
+	lambda_right_side.branch_list.push_back(return_types_temp);
+
+	Branch funcnew_argv;
+	funcnew_argv.type = FUNCNEW_ARGV;
+	funcnew_argv.line = funcnew_argv_temp.line;
+	funcnew_argv.column = funcnew_argv_temp.column;
+	to_funcnew_argv(funcnew_argv, funcnew_argv_temp);
+	lambda_right_side.branch_list.push_back(funcnew_argv);
+
+	Branch return_types;
+	return_types.type = RETURN_TYPES;
+	return_types.line = return_types_temp.line;
+	return_types.column = return_types_temp.column;
+	to_return_types(return_types, return_types_temp);
+	lambda_right_side.branch_list.push_back(return_types);
+
+	Branch code_block;
+	code_block.type = CODE_BLOCK;
+	code_block.line = token_code_block_start.line;
+	code_block.column = token_code_block_start.column;
+	to_command_list(code_block, right_side,
+	return_type_end + 1, (int)right_side.branch_list.size()-2);
+	lambda_right_side.branch_list.push_back(code_block);
+
+	std::string type = "fn (";
+	for (int i = 0; i < (int)funcnew_argv_temp.branch_list.size();i++){
+		Branch v = funcnew_argv_temp.branch_list[i];
+		Branch nx;
+		if (i + 1 < (int)funcnew_argv_temp.branch_list.size()) {
+			nx = funcnew_argv_temp.branch_list[i + 1];
+		}
+
+		if (nx.type == OPERATOR && nx.str == ":") {
+			continue;
+		}
+		if (v.type == OPERATOR && v.str == ":") {
+			continue;
+		}
+
+		type += v.str;
+	}
+	type += ") -> ";
+	for (int i = 0; i < (int)return_types_temp.branch_list.size();i++){
+		Branch v = return_types_temp.branch_list[i];
+		Branch nx;
+		if (i + 1 < (int)return_types_temp.branch_list.size()) {
+			nx = return_types_temp.branch_list[i + 1];
+		}
+
+		type += v.str;
+	}
+	return type;
+}
+
+void new_branch_lambda_new(Branch &branch,
+const Branch &grouped_token_list, int start_pos, int end_pos) {
+	Branch var_name_token = grouped_token_list
+		                    .branch_list[start_pos + 1];
+	branch.branch_list.push_back(var_name_token);
+	
+
+	Branch var_type_token;
+	var_type_token.type = VAR_TYPE;
+
+
+	int right_side_start_at = 0;
+	for (int i = start_pos; i <= end_pos; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		if (v.type == OPERATOR && v.str == "=") {
+			right_side_start_at = i + 1;
+			break;
+		}
+	}
+
+
+	Branch right_side_start = grouped_token_list
+	                          .branch_list[right_side_start_at];
+	Branch right_side;
+	right_side.type = RIGHT_SIDE_TEMP;
+	right_side.line = right_side_start.line;
+	right_side.column = right_side_start.column;
+	for (int i = right_side_start_at; i <= end_pos; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		right_side.branch_list.push_back(v);
+	}
+	branch.branch_list.push_back(right_side);
+
+
+	Branch lambda_right_side;
+	lambda_right_side.type = LAMBDA_RIGHT_SIDE;
+	lambda_right_side.line = right_side.line;
+	lambda_right_side.column = right_side.column;
+	var_type_token.str
+		= to_lambda_right_side(lambda_right_side, right_side);
+	branch.branch_list.push_back(lambda_right_side);
+	branch.branch_list.push_back(var_type_token);
+}
+
+void new_branch_lambda_assign(Branch &branch,
+const Branch &grouped_token_list, int start_pos, int end_pos) {
+	Branch var_name_token = grouped_token_list
+	                        .branch_list[start_pos];
+	branch.branch_list.push_back(var_name_token);
+
+
+	Branch right_side_start = grouped_token_list
+	                          .branch_list[start_pos + 2];
+	Branch right_side;
+	right_side.type = RIGHT_SIDE_TEMP;
+	right_side.line = right_side_start.line;
+	right_side.column = right_side_start.column;
+	for (int i = start_pos + 2; i <= end_pos; i++) {
+		Branch v = grouped_token_list.branch_list[i];
+		right_side.branch_list.push_back(v);
+	}
+
+	branch.branch_list.push_back(right_side);
+
+
+	Branch var_type_token;
+	var_type_token.type = VAR_TYPE;
+
+	Branch lambda_right_side;
+	lambda_right_side.type = BRACKET_ROUND;
+	lambda_right_side.line = right_side.line;
+	lambda_right_side.column = right_side.column;
+	var_type_token.str
+		= to_lambda_right_side(lambda_right_side, right_side);
+	branch.branch_list.push_back(lambda_right_side);
+	branch.branch_list.push_back(var_type_token);
+}
 }
 
 void to_command_list(Branch &result, const Branch &grouped_token_list,
@@ -775,7 +980,14 @@ int start_pos, int end_pos) {
 			command_start_pos, command_end_pos);
 		} else if (command_type == BREAK) {
 		} else if (command_type == CONTINUE) {
+		} else if (command_type == LAMBDA_NEW) {
+			new_branch_lambda_new(new_branch, grouped_token_list,
+			command_start_pos, command_end_pos);
+		} else if (command_type == LAMBDA_ASSIGN) {
+			new_branch_lambda_assign(new_branch, grouped_token_list,
+			command_start_pos, command_end_pos);
 		}
+
 
 		result.branch_list.push_back(new_branch);
 		command_type = NONE;
@@ -794,15 +1006,35 @@ int start_pos, int end_pos) {
 		if (i - 1 >= 0) {
 			prev_token = grouped_token_list.branch_list[i - 1];
 		}
+		Branch nx_3;
+		if (i + 3 < (int)grouped_token_list.branch_list.size()) {
+			nx_3 = grouped_token_list.branch_list[i + 3];
+		}
+		Branch nx_2;
+		if (i + 2 < (int)grouped_token_list.branch_list.size()) {
+			nx_2 = grouped_token_list.branch_list[i + 2];
+		}
 
 		if (command_type == NONE) {
+			command_start_pos = i;
 			if (token.str == "let") {
-				command_start_pos = i;
-				command_type = VARNEW;
+				if (nx_3.str == "fn") {
+					command_type = LAMBDA_NEW;
+					code_block_count = -1;
+				}
+				else {
+					command_type = VARNEW;
+				}
 			}
 			else if (token.type == NAME && nx_token.str == "=") {
 				command_start_pos = i;
-				command_type = ASSIGN;
+				if (nx_2.str == "fn") {
+					command_type = LAMBDA_ASSIGN;
+					code_block_count = 0;
+				}
+				else {
+					command_type = ASSIGN;
+				}
 			}
 			else if (token.type == NAME && nx_token.str == "(") {
 				command_start_pos = i;
@@ -917,6 +1149,16 @@ int start_pos, int end_pos) {
 		}
 		if (command_type == CONTINUE) {
 			command_finished(i);
+		}
+		if (command_type == LAMBDA_NEW) {
+			if (code_block_end(token, code_block_count)) {
+				command_finished(i);
+			}
+		}
+		if (command_type == LAMBDA_ASSIGN) {
+			if (code_block_end(token, code_block_count)) {
+				command_finished(i);
+			}
 		}
 	}
 

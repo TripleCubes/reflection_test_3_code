@@ -61,6 +61,10 @@ enum BranchType: int {
 	RETURN,
 	CONTINUE,
 	BREAK,
+
+	LAMBDA_ASSIGN,
+	LAMBDA_NEW,
+	LAMBDA_RIGHT_SIDE,
 };
 
 std::string to_str(BranchType branch_type);

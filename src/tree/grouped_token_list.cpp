@@ -37,7 +37,7 @@ void to_grouped_token_list(Branch &result, const Branch &token_list) {
 				grouping = true;
 			}
 			else if (token.type == NAME && nx_token.str == "["
-			&& nx_nx_token.type == NUM) {
+			&& (nx_nx_token.type == NUM || nx_nx_token.type == NAME)) {
 				grouping = true;
 			}
 			else {

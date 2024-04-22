@@ -84,6 +84,10 @@ std::string to_str(BranchType branch_type) {
 	case BREAK: return "BREAK"; break;
 	case CONTINUE: return "CONTINUE"; break;
 
+	case LAMBDA_ASSIGN: return "LAMBDA_ASSIGN"; break;
+	case LAMBDA_NEW: return "LAMBDA_NEW"; break;
+	case LAMBDA_RIGHT_SIDE: return "LAMBDA_RIGHT_SIDE"; break;
+
 	default: return "UNHANDLED"; break;
 	}
 

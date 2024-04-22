@@ -2,7 +2,6 @@
 
 #include "../tree/types.h"
 #include "../tree/calc_tree/shared.h"
-#include "../tree/var_types.h"
 #include <vector>
 
 namespace {

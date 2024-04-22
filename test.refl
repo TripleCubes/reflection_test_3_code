@@ -7,3 +7,15 @@ type B from A {
 	x: number = 3,
 	z: A = {},
 }
+
+a[b].c = 10
+
+let f: fn = fn(a: number, b: number) -> void
+	print('aaaa')
+end
+
+f = fn(m: string) -> void
+	a = 10
+end
+
+let c: number = 10
