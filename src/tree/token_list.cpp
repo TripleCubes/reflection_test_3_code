@@ -39,7 +39,7 @@ std::vector<std::string> keyword_list = {
 	"let", "const",
 	"if", "elseif", "for", "while", "fn", "then", "do",
 	"end",
-	"type",
+	"type", "from",
 	"number", "string", "bool", "void",
 	"return", "break", "continue",
 };

@@ -658,14 +658,17 @@ const Branch &grouped_token_list, int content_start, int content_end) {
 			nx_nx = grouped_token_list.branch_list[i + 2];
 		}
 
-		if (v.type == OPERATOR && v.str == ","
-		&& (nx.str == "}" || nx_nx.str == ":")) {
+		if (v.type == OPERATOR && v.str == "," && nx_nx.str == ":") {
 			member_finished(i - 1);
 			start = i + 1;
 		}
 	}
 
-	if (start < content_end + 1) {
+	Branch end_token = grouped_token_list.branch_list[content_end];
+	if (end_token.type == OPERATOR && end_token.str == ",") {
+		member_finished(content_end - 1);
+	}
+	else {
 		member_finished(content_end);
 	}
 }
@@ -675,8 +678,15 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 	Branch name_token = grouped_token_list.branch_list[start_pos + 1];
 	branch.branch_list.push_back(name_token);
 
-	
 	int content_start = start_pos + 3;
+	Branch inherit_token;
+	Branch from_token = grouped_token_list.branch_list[start_pos + 2];
+	if (from_token.type == KEYWORD && from_token.str == "from") {
+		content_start = start_pos + 5;
+		inherit_token = grouped_token_list.branch_list[start_pos + 3];
+	}
+	branch.branch_list.push_back(inherit_token);
+
 	int content_end = end_pos - 1;
 	Branch content_start_token
 	       = grouped_token_list.branch_list[content_start];

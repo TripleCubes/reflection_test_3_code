@@ -1,1 +1,9 @@
-let a: number = 1 + add(9, 10,)
+type A {
+	x: number = 10,
+	y: number = 20,
+}
+
+type B from A {
+	x: number = 3,
+	z: A = {},
+}

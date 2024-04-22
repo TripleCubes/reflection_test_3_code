@@ -288,14 +288,19 @@ int indent) {
 void type_to_str(std::string &result, const Branch &branch,
 int indent) {
 	Branch name;
+	Branch inherit;
 	Branch type_member_list;
 	std::vector<std::string> param_list;
+	std::vector<std::string> type_list;
 	std::vector<Branch> defl_list;
 
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
-		if (v.type == NAME) {
+		if (i == 0) {
 			name = v;
+		}
+		else if (i == 1) {
+			inherit = v;
 		}
 		else if (v.type == TYPE_MEMBER_LIST) {
 			type_member_list = v;
@@ -310,6 +315,11 @@ int indent) {
 		std::string param;
 		str_grouped_token(param, name);
 		param_list.push_back(param);
+		
+		std::string type_str;
+		str_grouped_token(type_str, type);
+		type_list.push_back(type_str);
+
 		defl_list.push_back(defl);
 	}
 
@@ -317,17 +327,35 @@ int indent) {
 	str_grouped_token(result, name);
 	result += "()\n";
 	str_indent(result, indent + 1);
-	result += "return {\n";
+	result += "local a = ";
+
+	if (inherit.type == NONE) {
+		result += "{}\n";
+	} else {
+		result += TYPEDEFL_BEGIN;
+		str_grouped_token(result, inherit);
+		result += "()\n";
+	}
+
 	for (int i = 0; i < (int)param_list.size(); i++) {
 		const std::string &param = param_list[i];
+		const std::string &type = type_list[i];
 		const Branch &defl = defl_list[i];
-		str_indent(result, indent + 2);
-		result += param + " = ";
-		str_bracket(result, defl);
-		result += ",\n";
+
+		str_indent(result, indent + 1);
+		result += "a." + param + " = ";
+
+		Branch calc_start_branch = defl.branch_list[0].branch_list[0];
+		if (calc_start_branch.type == BRACKET_CURLY) {
+			result += TYPEDEFL_BEGIN + type + "()";
+		}
+		else {
+			str_bracket(result, defl);
+		}
+		result += "\n";
 	}
 	str_indent(result, indent + 1);
-	result += "}\n";
+	result += "return a\n";
 	str_indent(result, indent);
 	result += "end\n";
 }
