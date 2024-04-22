@@ -224,9 +224,28 @@ void varnew_check(const Branch &token_list, int start, int end) {
 }
 }
 
+void assign_check(const Branch &token_list, int start, int end) {
+	if (sz(start, end) < 3) {
+		err_cant_parse(token_list, start);
+	}
+
+	if (token_list.branch_list[start].type != NAME) {
+		err_cant_parse(token_list, start);
+	}
+
+	if (token_list.branch_list[start + 1].str != "=") {
+		err_cant_parse(token_list, start + 1);
+	}
+
+	right_side_check(token_list, start + 2, end);
+}
+
 void parse_check(const Branch &token_list, BranchType branch_type,
 int start, int end) {
 	if (branch_type == VARNEW) {
 		varnew_check(token_list, start, end);
+	}
+	else if (branch_type == ASSIGN) {
+		assign_check(token_list, start, end);
 	}
 }
