@@ -1,27 +1,3 @@
-type A {
-	x: number = 10,
-	y: number = 20,
-}
-
-type B from A {
-	x: number = 3,
-	z: A = {},
-	f: fn = fn(a: number) -> void
-		a = 20
-	end
-}
-
-a[b].c = 10
-
-let f: fn = fn(a: number, b: number) -> void
-	print('aaaa')
+fn test(x: number, y: number) -> void
+	print(10)
 end
-
-f = fn(m: string) -> void
-	a = 10
-end
-
-fn a(a, b) -> void
-end
-
-let c: number = 10 * 8
