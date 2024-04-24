@@ -6,6 +6,7 @@
 
 namespace {
 std::string code_str;
+std::string type_err_msg_str;
 
 void str_grouped_token(std::string &result, const Branch &token) {
 	if (token.str != "") {
@@ -156,8 +157,9 @@ void type_err_msg(const Branch &branch, TypeErrMsgType type) {
 		break;
 	}
 
-	std::cout << branch.line << ":" << branch.column
-		<< s << std::endl;
+	type_err_msg_str += std::to_string(branch.line) + ":" 
+		+ std::to_string(branch.column)
+		+ s + "\n";
 	
 	std::string s2;
 	std::string s3;
@@ -172,10 +174,13 @@ void type_err_msg(const Branch &branch, TypeErrMsgType type) {
 	s3 += "| ";
 	s3 += arrow(branch.column) + "\n";
 
-	std::cout << s2 << s3;
-	exit(0);
+	type_err_msg_str += s2 + s3 + "\n";
 }
 
 void err_msg_set_code_str(const std::string &in_code_str) {
 	code_str = in_code_str;
+}
+
+std::string get_type_err_msg_str() {
+	return type_err_msg_str;
 }

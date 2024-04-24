@@ -28,6 +28,11 @@ int main() {
 	print_branch(command_list, 0);
 
 	type_check(command_list);
+	std::string type_err_msg_str = get_type_err_msg_str();
+	if ((int)type_err_msg_str.length() != 0) {
+		std::cout << type_err_msg_str << std::endl;
+		return 0;
+	}
 
 	std::string lua_str;
 	tree_to_lua(lua_str, command_list);

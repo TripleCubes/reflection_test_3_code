@@ -203,6 +203,7 @@ VarCheckLists &var_check_list, int this_scope) {
 	if ((int)bracket.branch_list.size() - 1
 	!= (int)argv_type_list.size()) {
 		type_err_msg(bracket, INCOMPATIBLE_ARGV_NUM);
+		return return_type;
 	}
 
 	for (int i = 0; i < (int)bracket.branch_list.size() - 1; i++) {
@@ -332,4 +333,5 @@ void type_check(const Branch &tree) {
 	code_block_check(tree, var_check_list, -1);
 	print_declare_lists(var_check_list.vd_list,
 	                    var_check_list.td_list);
+	std::cout << std::endl;
 }
