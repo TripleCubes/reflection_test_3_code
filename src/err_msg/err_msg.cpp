@@ -5,6 +5,8 @@
 #include <string>
 
 namespace {
+std::string code_str;
+
 void str_grouped_token(std::string &result, const Branch &token) {
 	if (token.str != "") {
 		result += token.str;
@@ -53,6 +55,30 @@ void draw_err_pos(const Branch &token_list, int pos) {
 
 	std::cout << str << std::endl;
 	std::cout << str_arrow << std::endl << std::endl;
+}
+
+std::string err_line(int line) {
+	std::string result;
+	int current_line = 1;
+	for (int i = 0; i < (int)code_str.length(); i++) {
+		char c = code_str[i];
+		if (c == '\n') {
+			current_line++;
+		}
+		else if (current_line == line) {
+			result += c;
+		}
+	}
+	return result;
+}
+
+std::string arrow(int column) {
+	std::string result;
+	for (int i = 0; i < column - 2; i++) {
+		result += " ";
+	}
+	result += "^";
+	return result;
 }
 }
 
@@ -132,5 +158,24 @@ void type_err_msg(const Branch &branch, TypeErrMsgType type) {
 
 	std::cout << branch.line << ":" << branch.column
 		<< s << std::endl;
+	
+	std::string s2;
+	std::string s3;
+	s2 += "  " + std::to_string(branch.line) + " | ";
+
+	for (int i = 0; i < (int)s2.length() - 2; i++) {
+		s3 += " ";
+	}
+
+	s2 += err_line(branch.line) + "\n";
+	
+	s3 += "| ";
+	s3 += arrow(branch.column) + "\n";
+
+	std::cout << s2 << s3;
 	exit(0);
+}
+
+void err_msg_set_code_str(const std::string &in_code_str) {
+	code_str = in_code_str;
 }

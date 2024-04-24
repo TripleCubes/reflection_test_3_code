@@ -1,6 +1,8 @@
 #ifndef ERR_MSG_ERR_MSG_H
 #define ERR_MSG_ERR_MSG_H
 
+#include <string>
+
 struct Branch;
 
 enum ErrMsgType: int {
@@ -29,5 +31,6 @@ enum TypeErrMsgType: int {
 
 void err_msg(const Branch &token_list, ErrMsgType type, int pos);
 void type_err_msg(const Branch &branch, TypeErrMsgType type);
+void err_msg_set_code_str(const std::string &in_code_str);
 
 #endif

@@ -7,10 +7,12 @@
 #include "tree/command_list.h"
 #include "tree_to_lua/tree_to_lua.h"
 #include "type_checker/type_checker.h"
+#include "err_msg/err_msg.h"
 
 int main() {
 	std::string code_str = file_to_str("./test.refl");
 	std::cout << code_str << std::endl;
+	err_msg_set_code_str(code_str);
 
 	Branch token_list;
 	to_token_list(token_list, code_str);
