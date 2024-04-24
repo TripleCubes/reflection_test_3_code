@@ -21,6 +21,13 @@ enum ErrMsgType: int {
 	EXPECT_VAR_NAME,
 };
 
+enum TypeErrMsgType: int {
+	INCOMPATIBLE_OP,
+	INCOMPATIBLE_ARGV_NUM,
+	INCOMPATIBLE_TYPE,
+};
+
 void err_msg(const Branch &token_list, ErrMsgType type, int pos);
+void type_err_msg(const Branch &branch, TypeErrMsgType type);
 
 #endif

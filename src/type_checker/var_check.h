@@ -15,10 +15,29 @@ struct TypeDeclare {
 	std::vector<VarDeclare> member_list;
 };
 
+struct FuncDeclare {
+	int var_declare_index;
+	std::vector<std::string> argv;
+	std::string return_type;
+};
+
 std::string get_var_type(
 	const std::vector<VarDeclare> &var_declare_list,
 	const std::string &var_name,
 	const std::vector<int> &scope_tree, int scope_id);
+
+void get_argv_type_list(
+	std::vector<std::string> &argv_type_list,
+	const std::string &func_name,
+	const std::vector<VarDeclare> vd_list,
+	const std::vector<FuncDeclare> fd_list, 
+	int this_scope);
+
+std::string get_return_type(
+	const std::string &func_name,
+	const std::vector<VarDeclare> vd_list,
+	const std::vector<FuncDeclare> fd_list,
+	int this_scope);
 
 int get_type_declare_i(
 	const std::vector<TypeDeclare> &type_declare_list,

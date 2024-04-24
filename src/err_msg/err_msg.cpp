@@ -112,3 +112,25 @@ void err_msg(const Branch &token_list, ErrMsgType type, int pos) {
 	draw_err_pos(token_list, pos);
 	exit(0);
 }
+
+void type_err_msg(const Branch &branch, TypeErrMsgType type) {
+	std::string s;
+	switch (type) {
+	case INCOMPATIBLE_OP:
+		s = " incompatibe operator";
+		break;
+	case INCOMPATIBLE_ARGV_NUM:
+		s = " incompatible number of arguments";
+		break;
+	case INCOMPATIBLE_TYPE:
+		s = " incompatible type";
+		break;
+	default:
+		s = " type check unhandled";
+		break;
+	}
+
+	std::cout << branch.line << ":" << branch.column
+		<< s << std::endl;
+	exit(0);
+}

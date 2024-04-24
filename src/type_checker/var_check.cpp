@@ -41,11 +41,48 @@ const std::vector<int> &scope_tree, int scope_id) {
 	for (int i = 0; i < (int)var_declare_list.size(); i++) {
 		const VarDeclare &v = var_declare_list[i];
 
-		bool cond = scope_id == -1
-			|| is_in_scope(scope_tree, scope_id, v.scope_id);
+		bool cond = is_in_scope(scope_tree, scope_id, v.scope_id);
 
 		if (v.var_name == replace_arr_index(var_name) && cond) {
 			return var_declare_list[i].var_type;
+		}
+	}
+	return "";
+}
+
+void get_argv_type_list(
+std::vector<std::string> &argv_type_list,
+const std::string &func_name,
+const std::vector<VarDeclare> vd_list,
+const std::vector<FuncDeclare> fd_list,
+int this_scope) {
+	for (int i = 0; i < (int)fd_list.size(); i++) {
+		const FuncDeclare func_declare = fd_list[i];
+		int index = func_declare.var_declare_index;
+		const VarDeclare &var_declare = vd_list[index];
+		if (var_declare.var_name == func_name
+		&& var_declare.scope_id == this_scope) {
+			for (int j = 0; j < (int)func_declare.argv.size(); j++) {
+				const std::string &arg_type
+					= func_declare.argv[j];
+				argv_type_list.push_back(arg_type);
+			}
+		}
+	}
+}
+
+std::string get_return_type(
+const std::string &func_name,
+const std::vector<VarDeclare> vd_list,
+const std::vector<FuncDeclare> fd_list,
+int this_scope) {
+	for (int i = 0; i < (int)fd_list.size(); i++) {
+		const FuncDeclare func_declare = fd_list[i];
+		int index = func_declare.var_declare_index;
+		const VarDeclare &var_declare = vd_list[index];
+		if (var_declare.var_name == func_name
+		&& var_declare.scope_id == this_scope) {
+			return func_declare.return_type;
 		}
 	}
 	return "";
