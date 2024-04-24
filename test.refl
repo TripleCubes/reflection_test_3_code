@@ -1,3 +1,3 @@
-fn test(x: number, y: number) -> void
-	print(10)
+fn a(x: number[], b: string) -> void
+	let a: number[] = 4 + (a + 6
 end

@@ -22,7 +22,7 @@ void spaces(std::string &str, int n) {
 	}
 }
 
-void draw_err_pos(const Branch &token_list, int pos, int offset) {
+void draw_err_pos(const Branch &token_list, int pos) {
 	std::string str;
 	std::string str_code;
 	std::string str_arrow;
@@ -48,7 +48,7 @@ void draw_err_pos(const Branch &token_list, int pos, int offset) {
 	spaces(str_arrow, (int)str.length() - 2);
 	str_arrow += "| ";
 	str += str_code;
-	spaces(str_arrow, x + offset);
+	spaces(str_arrow, x);
 	str_arrow += "^";
 
 	std::cout << str << std::endl;
@@ -56,100 +56,59 @@ void draw_err_pos(const Branch &token_list, int pos, int offset) {
 }
 }
 
-void err_right_side_start(const Branch &token_list, int pos) {
+void err_msg(const Branch &token_list, ErrMsgType type, int pos) {
+	std::string s;
+	switch (type) {
+	case EXPECT_VALUE_AT_START:
+		s = " value expected";
+		break;
+	case EXPECT_OP:
+		s = " operator expected";
+		break;
+	case EXPECT_VALUE:
+		s = " value expected";
+		break;
+	case EXPECT_CLOSE_ROUND_BRACKET:
+		s = " ')' expected";
+		break;
+	case EXPECT_CLOSE_SQUARE_BRACKET:
+		s = " ']' expected";
+		break;
+	case UNEXPECTED_CLOSE_ROUND_BRACKET:
+		s = " ')' not expected";
+		break;
+	
+	case CANT_PARSE:
+		s = " cant parse";
+		break;
+	case EXPECT_VAR_TYPE:
+		s = " var type expected";
+		break;
+	case EXPECT_RETURN_TYPE:
+		s = " return type expected";
+		break;
+	
+	case EXPECT_COLON:
+		s = " ':' expected";
+		break;
+	case EXPECT_COMMA:
+		s = " ',' expected";
+		break;
+	case EXPECT_ARROW:
+		s = " '->' expected";
+		break;
+	case EXPECT_VAR_NAME:
+		s = " var name expected";
+		break;
+
+		default:
+		s = " unhandled";
+		break;
+	}
+
 	const Branch &token = token_list.branch_list[pos];
 	std::cout << token.line << ":" << token.column
-		<< " expected a value" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_right_side_expect_op(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column + 1
-		<< " expected an operator" << std::endl;
-	draw_err_pos(token_list, pos, 1);
-	exit(0);
-}
-
-void err_right_side_expect_value(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column + 1
-		<< " expected a value" << std::endl;
-	draw_err_pos(token_list, pos, 1);
-	exit(0);
-}
-
-void err_right_side_unexpected_close_bracket(const Branch &token_list,
-                                             int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " unexpected close round bracket" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_cant_parse(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " cant parse" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_not_a_var_type(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected a var type" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_not_a_return_type(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected a return type" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_expect_colon(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected ':'" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_expect_comma(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected ','" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_expect_close_square_bracket(const Branch &token_list,
-int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected ']'" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_expect_var_name(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected a var name" << std::endl;
-	draw_err_pos(token_list, pos, 0);
-	exit(0);
-}
-
-void err_expect_arrow(const Branch &token_list, int pos) {
-	const Branch &token = token_list.branch_list[pos];
-	std::cout << token.line << ":" << token.column
-		<< " expected '->'" << std::endl;
-	draw_err_pos(token_list, pos, 0);
+		<< s << std::endl;
+	draw_err_pos(token_list, pos);
 	exit(0);
 }
