@@ -19,16 +19,24 @@ int scope_id, int in_scope_id) {
 }
 
 std::string replace_arr_index(const std::string &var_name) {
-	std::string result = var_name;
+	std::string result;
 
-	for (int i = 0; i < (int)result.length(); i++) {
-		char prev = ' ';
-		if (i - 1 >= 0) {
-			prev = result[i - 1];
+	bool in_bracket = false;
+
+	for (int i = 0; i < (int)var_name.length(); i++) {
+		char c = var_name[i];
+
+		if (c == ']') {
+			in_bracket = false;
+			result += '0';
 		}
 
-		if (prev == '[') {
-			result[i] = '0';
+		if (!in_bracket) {
+			result += c;
+		}
+
+		if (c == '[' && i + 1 < (int)var_name.length()) {
+			in_bracket = true;
 		}
 	}
 
