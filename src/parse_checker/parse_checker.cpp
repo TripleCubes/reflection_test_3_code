@@ -125,47 +125,47 @@ bool in_funccall) {
 
 		if (i == start && (!is_value(v) && !is_reverse_op(v)
 		&& v.str != "(")) {
-			err_msg(token_list, EXPECT_VALUE_AT_START, start);
+			err_msg(v, EXPECT_VALUE_AT_START);
 		}
 
 		if (!in_funccall) {
 			if (is_value(v) && !is_next_to_value(nx)) {
-				err_msg(token_list, EXPECT_OP, i);
+				err_msg(v, EXPECT_OP);
 			}
 
 			if (is_op(v) && !is_next_to_op(nx, nx_nx)) {
-				err_msg(token_list, EXPECT_VALUE, i);
+				err_msg(v, EXPECT_VALUE);
 			}
 
 			if (v.str == "(" && !is_next_to_open_bracket(nx)) {
-				err_msg(token_list, EXPECT_VALUE, i);
+				err_msg(v, EXPECT_VALUE);
 			}
 
 			if (v.str == ")" && !is_next_to_close_bracket(nx)) {
-				err_msg(token_list, EXPECT_OP, i);
+				err_msg(v, EXPECT_OP);
 			}
 		}
 
 		if (in_funccall) {
 			if (v.str == "(" && !is_next_to_open_bracket(nx)) {
-				err_msg(token_list, EXPECT_VALUE, i);
+				err_msg(v, EXPECT_VALUE);
 			}
 			
 			if (is_value(v) && !f_is_next_to_value(nx)) {
-				err_msg(token_list, EXPECT_OP, i);
+				err_msg(v, EXPECT_OP);
 			}
 
 			if (is_op(v) && !is_next_to_op(nx, nx_nx)) {
-				err_msg(token_list, EXPECT_VALUE, i);
+				err_msg(v, EXPECT_VALUE);
 			}
 
 			if (v.str == ")"
 			&& !f_is_next_to_close_bracket(nx, f_bracket_count)) {
-				err_msg(token_list, EXPECT_OP, i);
+				err_msg(v, EXPECT_OP);
 			}
 
 			if (v.str == "," && !f_is_next_to_comma(nx)) {
-				err_msg(token_list, EXPECT_VALUE, i);
+				err_msg(v, EXPECT_VALUE);
 			}
 
 			if (v.str == "(") {
@@ -189,41 +189,42 @@ bool in_funccall) {
 		else if (v.str == ")") {
 			bracket_count--;
 			if (bracket_count < 0) {
-				err_msg(token_list, UNEXPECTED_CLOSE_ROUND_BRACKET, i);
+				err_msg(v, UNEXPECTED_CLOSE_ROUND_BRACKET);
 			}
 		}
 	}
 	
+	const Branch &end_token = token_list.branch_list[end];
 	if (bracket_count > 0) {
-		err_msg(token_list, EXPECT_CLOSE_ROUND_BRACKET, end);
+		err_msg(end_token, EXPECT_CLOSE_ROUND_BRACKET);
 	}
 }
 
 void varnew_check(const Branch &token_list, int start, int end) {
 	int equal_sign_pos = start + 4;
 	if (sz(start, end) < 6) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 	if (token_list.branch_list[start + 1].type != NAME) {
-		err_msg(token_list, CANT_PARSE, start + 1);
+		err_msg(token_list.branch_list[start + 1], CANT_PARSE);
 	}
 	if (token_list.branch_list[start + 2].str != ":") {
-		err_msg(token_list, CANT_PARSE, start + 2);
+		err_msg(token_list.branch_list[start + 2], CANT_PARSE);
 	}
 	if (!is_var_type(token_list.branch_list[start + 3])) {
-		err_msg(token_list, CANT_PARSE, start + 3);
+		err_msg(token_list.branch_list[start + 3], CANT_PARSE);
 	}
 	if (token_list.branch_list[start + 4].str == "[") {
 		equal_sign_pos = start + 6;
 		if (sz(start, end) < 8) {
-			err_msg(token_list, CANT_PARSE, start);
+			err_msg(token_list.branch_list[start], CANT_PARSE);
 		}
 		if (token_list.branch_list[start + 5].str != "]") {
-			err_msg(token_list, CANT_PARSE, start);
+			err_msg(token_list.branch_list[start], CANT_PARSE);
 		}
 	}
 	if (token_list.branch_list[equal_sign_pos].str != "=") {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	right_side_check(token_list, equal_sign_pos + 1, end, false);
@@ -231,15 +232,15 @@ void varnew_check(const Branch &token_list, int start, int end) {
 
 void assign_check(const Branch &token_list, int start, int end) {
 	if (sz(start, end) < 3) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start].type != NAME) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start + 1].str != "=") {
-		err_msg(token_list, CANT_PARSE, start + 1);
+		err_msg(token_list.branch_list[start + 1], CANT_PARSE);
 	}
 
 	right_side_check(token_list, start + 2, end, false);
@@ -247,19 +248,19 @@ void assign_check(const Branch &token_list, int start, int end) {
 
 void funccall_check(const Branch &token_list, int start, int end) {
 	if (sz(start, end) < 3) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start].type != NAME) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start + 1].str != "(") {
-		err_msg(token_list, CANT_PARSE, start + 1);
+		err_msg(token_list.branch_list[start + 1], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[end].str != ")") {
-		err_msg(token_list, CANT_PARSE, end);
+		err_msg(token_list.branch_list[end], CANT_PARSE);
 	}
 
 	right_side_check(token_list, start + 2, end - 1, true);
@@ -278,50 +279,50 @@ void argument_list_check(const Branch &token_list, int start, int end){
 		}
 
 		if (v.type == NAME && nx.str != ":") {
-			err_msg(token_list, EXPECT_COLON, i);
+			err_msg(v, EXPECT_COLON);
 		}
 
 		if (v.str == ":" && !is_var_type(nx)) {
-			err_msg(token_list, EXPECT_VAR_TYPE, i);
+			err_msg(v, EXPECT_VAR_TYPE);
 		}
 
 		if (is_var_type(v) && prev.str == ":" && !(nx.str == ","
 		|| nx.str == "[" || nx.type == NONE)) {
-			err_msg(token_list, EXPECT_COMMA, i);
+			err_msg(v, EXPECT_COMMA);
 		}
 
 		if (v.str == "[" && nx.str != "]") {
-			err_msg(token_list, EXPECT_CLOSE_SQUARE_BRACKET, i);
+			err_msg(v, EXPECT_CLOSE_SQUARE_BRACKET);
 		}
 
 		if (v.str == "]" && !(nx.str == ","
 		|| nx.type == NONE)) {
-			err_msg(token_list, EXPECT_COMMA, i);
+			err_msg(v, EXPECT_COMMA);
 		}
 
 		if (v.str == "," && nx.type != NAME) {
-			err_msg(token_list, EXPECT_VAR_NAME, i);
+			err_msg(v, EXPECT_VAR_NAME);
 		}
 	}
 }
 
 void funcnew_check(const Branch &token_list, int start, int end) {
 	if (sz(start, end) < 7) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start + 1].type != NAME) {
-		err_msg(token_list, CANT_PARSE, start + 1);
+		err_msg(token_list.branch_list[start + 1], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[start + 2].str != "(") {
-		err_msg(token_list, CANT_PARSE, start + 2);
+		err_msg(token_list.branch_list[start + 2], CANT_PARSE);
 	}
 
 	int bracket_close = 0;
 	for (int i = start + 3; i <= end; i++) {
 		if (i == end) {
-			err_msg(token_list, CANT_PARSE, start);
+			err_msg(token_list.branch_list[start], CANT_PARSE);
 		}
 
 		const Branch &v = token_list.branch_list[i];
@@ -334,27 +335,28 @@ void funcnew_check(const Branch &token_list, int start, int end) {
 	argument_list_check(token_list, start + 3, bracket_close - 1);
 
 	if (end - start < bracket_close - start + 3) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	if (token_list.branch_list[bracket_close + 1].str != "->") {
-		err_msg(token_list, EXPECT_ARROW, bracket_close + 1);
+		err_msg(token_list.branch_list[bracket_close+1], EXPECT_ARROW);
 	}
 
 	if (!is_return_type(token_list.branch_list[bracket_close + 2])) {
-		err_msg(token_list, EXPECT_RETURN_TYPE, bracket_close + 1);
+		err_msg(token_list.branch_list[bracket_close+1],
+		        EXPECT_RETURN_TYPE);
 	}
 }
 
 void if_check(const Branch &token_list, int start, int end) {
 	if (sz(start, end) < 4) {
-		err_msg(token_list, CANT_PARSE, start);
+		err_msg(token_list.branch_list[start], CANT_PARSE);
 	}
 
 	int then_pos = 0;
 	for (int i = start + 1; i <= end; i++) {
 		if (i == end) {
-			err_msg(token_list, CANT_PARSE, start);
+			err_msg(token_list.branch_list[start], CANT_PARSE);
 		}
 
 		const Branch &v = token_list.branch_list[i];

@@ -29,7 +29,7 @@ enum TypeErrMsgType: int {
 	INCOMPATIBLE_TYPE,
 };
 
-void err_msg(const Branch &token_list, ErrMsgType type, int pos);
+void err_msg(const Branch &branch, ErrMsgType type);
 void type_err_msg(const Branch &branch, TypeErrMsgType type);
 void err_msg_set_code_str(const std::string &in_code_str);
 std::string get_type_err_msg_str();
