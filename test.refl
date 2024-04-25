@@ -1,2 +1,9 @@
-fn a(m: A[], n: A) -> A
-end
+type A {
+	a: number = 10
+}
+type B {
+	b: A = {},
+}
+
+let x: B = {}
+x.b.a = false

@@ -313,7 +313,16 @@ VarCheckLists &var_check_lists, int this_scope) {
 		check_type = var_type;
 	}
 	if (check_type != var_type) {
-		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,check_type);
+		if (is_primitive(var_type) || is_array) {
+			type_err_msg(right_side,INCOMPATIBLE_TYPE,
+			             var_type,check_type);
+		}
+		else {
+			if (check_type != "{}") {
+				type_err_msg(right_side,INCOMPATIBLE_TYPE,
+							 var_type,check_type);
+			}
+		}
 	}
 
 	VarDeclare declare;
@@ -536,9 +545,18 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 
 		if (check_type != type) {
-			type_err_msg(right_side,INCOMPATIBLE_TYPE,type,check_type);
+			if (is_primitive(type) || is_array) {
+				type_err_msg(right_side,INCOMPATIBLE_TYPE,
+							 type,check_type);
+			}
+			else {
+				if (check_type != "{}") {
+					type_err_msg(right_side,INCOMPATIBLE_TYPE,
+								 type,check_type);
+				}
+			}
 		}
-		
+	
 		VarDeclare var_declare;
 		str_grouped_token(var_declare.var_name, v.branch_list[0]);
 		var_declare.var_type = type;
