@@ -33,13 +33,13 @@ void str_grouped_token(std::string &result, const Branch &token) {
 }
 
 std::string get_round_bracket_value_type(const Branch &bracket,
-VarCheckLists &var_check_list, int this_scope);
+VarCheckLists &var_check_lists, int this_scope);
 
 std::string get_funccall_bracket_value_type(const Branch &bracket,
-VarCheckLists &var_check_list, int this_scope);
+VarCheckLists &var_check_lists, int this_scope);
 
 std::string get_calc_value_type(const Branch &calc,
-VarCheckLists &var_check_list, int this_scope) {
+VarCheckLists &var_check_lists, int this_scope) {
 	Branch value_token;
 
 	if (calc.type == CALC_START) {
@@ -51,11 +51,17 @@ VarCheckLists &var_check_list, int this_scope) {
 
 	if (value_token.type == BRACKET_ROUND) {
 		return get_round_bracket_value_type(value_token,
-			var_check_list, this_scope);
+			var_check_lists, this_scope);
 	}
 	else if (value_token.type == BRACKET_FUNCCALL) {
 		return get_funccall_bracket_value_type(value_token,
-			var_check_list, this_scope);
+			var_check_lists, this_scope);
+	}
+	else if (value_token.type == BRACKET_SQUARE) {
+		return "[]";
+	}
+	else if (value_token.type == BRACKET_CURLY) {
+		return "{}";
 	}
 
 	std::string value_name;
@@ -72,9 +78,9 @@ VarCheckLists &var_check_list, int this_scope) {
 		return "bool";
 	}
 	else {
-		return get_var_type(var_check_list.vd_list,
+		return get_var_type(var_check_lists.vd_list,
 		                    value_name,
-		                    var_check_list.scope_tree,
+		                    var_check_lists.scope_tree,
 		                    this_scope);
 	}
 	return "";
@@ -142,7 +148,7 @@ const std::string &op) {
 }
 
 std::string get_round_bracket_value_type(const Branch &bracket,
-VarCheckLists &var_check_list, int this_scope) {
+VarCheckLists &var_check_lists, int this_scope) {
 	std::string start_type;
 	std::string start_op;
 	for (int i = 0; i < (int)bracket.branch_list.size(); i++) {
@@ -164,7 +170,7 @@ VarCheckLists &var_check_list, int this_scope) {
 
 		if (is_start) {
 			start_type
-				= get_calc_value_type(v, var_check_list, this_scope);
+				= get_calc_value_type(v, var_check_lists, this_scope);
 			if (nx.type != NONE) {
 				start_op = nx.branch_list[0].str;
 			}
@@ -172,7 +178,7 @@ VarCheckLists &var_check_list, int this_scope) {
 		else {
 			Branch op_token = v.branch_list[0];
 			std::string right_type = get_calc_value_type(
-				v, var_check_list, this_scope);
+				v, var_check_lists, this_scope);
 			
 			if (!op_compatible(start_type, op_token.str)
 			|| !op_compatible(right_type, op_token.str)) {
@@ -188,18 +194,18 @@ VarCheckLists &var_check_list, int this_scope) {
 }
 
 std::string get_funccall_bracket_value_type(const Branch &bracket,
-VarCheckLists &var_check_list, int this_scope) {
+VarCheckLists &var_check_lists, int this_scope) {
 	int sz = (int)bracket.branch_list.size();
 	const Branch &func_name = bracket.branch_list[sz - 1];
 	
 	std::vector<std::string> argv_type_list;
 	get_argv_type_list(argv_type_list, func_name.str,
-	                   var_check_list.vd_list,
-	                   var_check_list.fd_list,
+	                   var_check_lists.vd_list,
+	                   var_check_lists.fd_list,
 	                   this_scope);
 	std::string return_type
-		= get_return_type(func_name.str, var_check_list.vd_list,
-		                  var_check_list.fd_list, this_scope);
+		= get_return_type(func_name.str, var_check_lists.vd_list,
+		                  var_check_lists.fd_list, this_scope);
 
 	if ((int)bracket.branch_list.size() - 1
 	!= (int)argv_type_list.size()) {
@@ -210,7 +216,7 @@ VarCheckLists &var_check_list, int this_scope) {
 	for (int i = 0; i < (int)bracket.branch_list.size() - 1; i++) {
 		const Branch &v = bracket.branch_list[i];
 		std::string v_type = get_calc_value_type(v.branch_list[0],
-			var_check_list, this_scope);
+			var_check_lists, this_scope);
 		const std::string &argv_type = argv_type_list[i];
 
 		if (v_type != argv_type) {
@@ -221,8 +227,31 @@ VarCheckLists &var_check_list, int this_scope) {
 	return return_type;
 }
 
+std::string get_array_type(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	std::string start_type;
+	const Branch bracket = branch.branch_list[0].branch_list[0];
+	for (int i = 0; i < (int)bracket.branch_list.size(); i++) {
+		const Branch &v = bracket.branch_list[i];
+		const Branch &arg = v.branch_list[0];
+		std::string type = get_calc_value_type(
+			arg, var_check_lists, this_scope);
+
+		if (i == 0) {
+			start_type = type;
+		}
+		else {
+			if (start_type != type) {
+				type_err_msg(v, INCOMPATIBLE_TYPE,
+					start_type, type);
+			}
+		}
+	}
+	return start_type + "[]";
+}
+
 void varnew_check(const Branch &branch,
-VarCheckLists &var_check_list, int this_scope) {
+VarCheckLists &var_check_lists, int this_scope) {
 	Branch var_name_token;
 	Branch var_type_token;
 	Branch right_side;
@@ -241,10 +270,22 @@ VarCheckLists &var_check_list, int this_scope) {
 		}
 	}
 
-	std::string right_side_type = get_round_bracket_value_type(
-		right_side, var_check_list, this_scope);
 	std::string var_type;
 	str_grouped_token(var_type, var_type_token);
+
+	if ((int)var_type_token.branch_list.size() == 1
+	&& var_type_token.branch_list[0].type == ARRAY_INDEX) {
+		std::string array_type
+			= get_array_type(right_side, var_check_lists, this_scope);
+		if (array_type != var_type) {
+			type_err_msg(right_side, INCOMPATIBLE_TYPE, var_type,
+				array_type);
+		}
+		return;
+	}
+
+	std::string right_side_type = get_round_bracket_value_type(
+		right_side, var_check_lists, this_scope);
 	if (right_side_type != var_type) {
 		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,
 		             right_side_type);
@@ -254,12 +295,12 @@ VarCheckLists &var_check_list, int this_scope) {
 	str_grouped_token(declare.var_name, var_name_token);
 	str_grouped_token(declare.var_type, var_type_token);
 	declare.scope_id = this_scope;
-	add_var_declare(var_check_list.vd_list, var_check_list.td_list,
+	add_var_declare(var_check_lists.vd_list, var_check_lists.td_list,
 	                declare);
 }
 
 void funcnew_check(const Branch &branch,
-VarCheckLists &var_check_list, int this_scope) {
+VarCheckLists &var_check_lists, int this_scope) {
 	Branch name_token;
 	Branch argv_branch;
 	Branch return_type_branch;
@@ -303,37 +344,37 @@ VarCheckLists &var_check_list, int this_scope) {
 	str_grouped_token(var_declare.var_name, name_token);
 	var_declare.var_type = func_type;
 	var_declare.scope_id = this_scope;
-	add_var_declare(var_check_list.vd_list,
-	                var_check_list.td_list,
+	add_var_declare(var_check_lists.vd_list,
+	                var_check_lists.td_list,
 	                var_declare);
 
 	func_declare.var_declare_index
-		= (int)var_check_list.vd_list.size() - 1;
+		= (int)var_check_lists.vd_list.size() - 1;
 	str_grouped_token(func_declare.return_type, return_type_branch);
-	var_check_list.fd_list.push_back(func_declare);
+	var_check_lists.fd_list.push_back(func_declare);
 }
 
 void code_block_check(const Branch &code_block,
-VarCheckLists &var_check_list, int parent_scope) {
-	int this_scope = (int)var_check_list.scope_tree.size();
+VarCheckLists &var_check_lists, int parent_scope) {
+	int this_scope = (int)var_check_lists.scope_tree.size();
 
 	for (int i = 0; i < (int)code_block.branch_list.size(); i++) {
 		const Branch &v = code_block.branch_list[i];
 		
 		if (v.type == VARNEW) {
-			varnew_check(v, var_check_list, this_scope);
+			varnew_check(v, var_check_lists, this_scope);
 		}
 		else if (v.type == FUNCNEW) {
-			funcnew_check(v, var_check_list, this_scope);
+			funcnew_check(v, var_check_lists, this_scope);
 		}
 	}
 }
 }
 
 void type_check(const Branch &tree) {
-	VarCheckLists var_check_list;
-	code_block_check(tree, var_check_list, -1);
-	print_declare_lists(var_check_list.vd_list,
-	                    var_check_list.td_list);
+	VarCheckLists var_check_lists;
+	code_block_check(tree, var_check_lists, -1);
+	print_declare_lists(var_check_lists.vd_list,
+	                    var_check_lists.td_list);
 	std::cout << std::endl;
 }

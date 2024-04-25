@@ -1,4 +1,4 @@
 fn a(x: number, y: number) -> number
 end
 
-let n: string = 10 + a(false, 20) + 20
+let n: A = {}

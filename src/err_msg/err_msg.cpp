@@ -51,6 +51,9 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case EXPECT_CLOSE_SQUARE_BRACKET:
 		s = " ']' expected";
 		break;
+	case EXPECT_CLOSE_CURLY_BRACKET:
+		s = " '}' expected";
+		break;
 	case UNEXPECTED_CLOSE_ROUND_BRACKET:
 		s = " ')' not expected";
 		break;
