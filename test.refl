@@ -1,11 +1,4 @@
-type B {
-	m: string = "aaaa",
-}
+fn hello(a: number, b: number) -> void
+end
 
-type A from B {
-	x: number = 10,
-}
-
-let a: A = {}
-a.x = 20
-a.b = 5
+hello(10, "test")

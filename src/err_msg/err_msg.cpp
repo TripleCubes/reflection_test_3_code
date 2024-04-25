@@ -143,13 +143,13 @@ const std::string &type1, const std::string &type2) {
 		s = " func not declared";
 		break;
 	case VAR_ALREADY_DECLARED:
-		s = " var already declared";
+		s = " name already declared";
 		break;
 	case FUNC_ALREADY_DECLARED:
-		s = " function already declared";
+		s = " name already declared";
 		break;
 	case TYPE_ALREADY_DECLARED:
-		s = " type already declared";
+		s = " name already declared";
 		break;
 	case INCOMPATIBLE_INHERITANCE_TYPE:
 		s = " incompatible inherited type\n";

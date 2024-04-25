@@ -210,6 +210,12 @@ VarCheckLists &var_check_lists, int this_scope) {
 	                   var_check_lists.vd_list,
 	                   var_check_lists.fd_list,
 	                   this_scope);
+
+	if (argv_type_list.size() == 0) {
+		type_err_msg(func_name, FUNC_NOT_DECLARED, "", "");
+		return "";
+	}
+
 	std::string return_type
 		= get_return_type(func_name.str, var_check_lists.vd_list,
 		                  var_check_lists.fd_list, this_scope);
@@ -603,6 +609,13 @@ VarCheckLists &var_check_lists, int this_scope) {
 	var_check_lists.td_list.push_back(type_declare);
 }
 
+void funccall_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch bracket = branch.branch_list[2];
+	get_funccall_bracket_value_type(bracket,
+		var_check_lists, this_scope);
+}
+
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
 CodeBlockType code_block_type,
@@ -630,6 +643,9 @@ const std::string &return_type) {
 		}
 		else if (v.type == TYPE) {
 			typenew_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == FUNCCALL) {
+			funccall_check(v, var_check_lists, this_scope);
 		}
 	}
 }
