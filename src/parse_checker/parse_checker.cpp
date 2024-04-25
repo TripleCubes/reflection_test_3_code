@@ -265,7 +265,25 @@ void assign_check(const Branch &token_list, int start, int end) {
 		err_msg(token_list.branch_list[start + 1], CANT_PARSE);
 	}
 
-	right_side_check(token_list, start + 2, end, false);
+	int equal_sign_pos = start + 1;
+	
+	if (token_list.branch_list[equal_sign_pos + 1].str == "{") {
+		err_msg(token_list.branch_list[equal_sign_pos + 1],
+		        OPEN_CURLY_IN_ASSIGN);
+	}
+
+	if (token_list.branch_list[equal_sign_pos + 1].str == "[") {
+		if (token_list.branch_list[end].str != "]") {
+			err_msg(token_list.branch_list[end],
+			        EXPECT_CLOSE_SQUARE_BRACKET);
+		}
+		else {
+			right_side_check(token_list,equal_sign_pos+2,end-1,true);
+			return;
+		}
+	}
+
+	right_side_check(token_list, equal_sign_pos + 1, end, false);
 }
 
 void funccall_check(const Branch &token_list, int start, int end) {

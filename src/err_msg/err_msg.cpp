@@ -57,6 +57,9 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case UNEXPECTED_CLOSE_ROUND_BRACKET:
 		s = " ')' not expected";
 		break;
+	case OPEN_CURLY_IN_ASSIGN:
+		s = " struct init only allowed in var initialization";
+		break;
 	
 	case CANT_PARSE:
 		s = " cant parse";

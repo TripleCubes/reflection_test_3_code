@@ -1,4 +1,3 @@
-fn a(x: number, y: number) -> number
-end
-
-let n: A = {}
+let a: number[] = [10, 20, 30]
+let b: number[] = []
+b = a

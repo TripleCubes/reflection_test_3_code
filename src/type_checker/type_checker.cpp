@@ -272,23 +272,33 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	std::string var_type;
 	str_grouped_token(var_type, var_type_token);
+	std::string check_type;
+	bool is_array = false;
 
-	if ((int)var_type_token.branch_list.size() == 1
-	&& var_type_token.branch_list[0].type == ARRAY_INDEX) {
-		std::string array_type
-			= get_array_type(right_side, var_check_lists, this_scope);
-		if (array_type != var_type) {
-			type_err_msg(right_side, INCOMPATIBLE_TYPE, var_type,
-				array_type);
-		}
-		return;
+	const Branch &first_calc = right_side.branch_list[0]
+	                                     .branch_list[0];
+	if (first_calc.type == BRACKET_SQUARE) {
+		is_array = true;
 	}
 
-	std::string right_side_type = get_round_bracket_value_type(
-		right_side, var_check_lists, this_scope);
-	if (right_side_type != var_type) {
-		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,
-		             right_side_type);
+	if (is_array)
+	{
+		std::string array_type
+			= get_array_type(right_side, var_check_lists, this_scope);
+		check_type = array_type;
+	}
+	else {
+		std::string right_side_type = get_round_bracket_value_type(
+			right_side, var_check_lists, this_scope);
+		check_type = right_side_type;
+	}
+
+	if (is_array && var_type[var_type.length()-1] == ']'
+	&& check_type == "[]") {
+		check_type = var_type;
+	}
+	if (check_type != var_type) {
+		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,check_type);
 	}
 
 	VarDeclare declare;
@@ -297,6 +307,60 @@ VarCheckLists &var_check_lists, int this_scope) {
 	declare.scope_id = this_scope;
 	add_var_declare(var_check_lists.vd_list, var_check_lists.td_list,
 	                declare);
+}
+
+void assign_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch var_name_token;
+	Branch right_side;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+
+		if (v.type == NAME) {
+			var_name_token = v;
+		}
+		else if (v.type == BRACKET_ROUND) {
+			right_side = v;
+		}
+	}
+
+	std::string var_name;
+	str_grouped_token(var_name, var_name_token);
+	std::string var_type = get_var_type(
+		var_check_lists.vd_list,
+		var_name,
+		var_check_lists.scope_tree,
+		this_scope);
+
+	bool is_arr = false;
+	std::string check_type;
+
+	const Branch &first_calc = right_side.branch_list[0]
+	                                     .branch_list[0];
+	if (first_calc.type == BRACKET_SQUARE) {
+		is_arr = true;
+	}
+
+	if (is_arr) {
+		std::string array_type
+			= get_array_type(right_side, var_check_lists, this_scope);
+		check_type = array_type;
+	}
+
+	else {
+		std::string right_side_type = get_round_bracket_value_type(
+			right_side, var_check_lists, this_scope);
+		check_type = right_side_type;
+	}
+
+	if (is_arr && var_type[var_type.length()-1] == ']'
+	&& check_type == "[]") {
+		check_type = var_type;
+	}
+	if (check_type != var_type) {
+		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,check_type);
+	}
 }
 
 void funcnew_check(const Branch &branch,
@@ -363,6 +427,9 @@ VarCheckLists &var_check_lists, int parent_scope) {
 		
 		if (v.type == VARNEW) {
 			varnew_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == ASSIGN) {
+			assign_check(v, var_check_lists, this_scope);
 		}
 		else if (v.type == FUNCNEW) {
 			funcnew_check(v, var_check_lists, this_scope);
