@@ -1,13 +1,7 @@
 type A {
-	a: string = "aaa",
-	b: string = 'bbb'
-}
-type B from A {
-	b: number = 20
-}
-type C from B {
-	c: number = 30,
+	m: number = 10,
 }
 
-let x: C = {}
-x.c = false
+type A {
+	n: number = 10,
+}

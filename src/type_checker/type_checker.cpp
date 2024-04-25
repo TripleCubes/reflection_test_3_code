@@ -277,10 +277,19 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	std::string var_name;
+	str_grouped_token(var_name, var_name_token);
+	std::string var_type_test = get_var_type(var_check_lists.vd_list,
+	                              var_name, var_check_lists.scope_tree,
+	                              this_scope);
+	if (var_type_test != "") {
+		type_err_msg(var_name_token, VAR_ALREADY_DECLARED, "", "");
+	}
+
 	if (!is_primitive(var_type_token.str)) {
-		int index = get_type_declare_i(var_check_lists.td_list,
-		                               var_type_token.str);
-		if (index == -1) {
+		int type_index = get_type_declare_i(var_check_lists.td_list,
+		                                    var_type_token.str);
+		if (type_index == -1) {
 			type_err_msg(var_type_token, TYPE_NOT_DECLARED, "", "");
 		}
 	}
@@ -326,7 +335,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	}
 
 	VarDeclare declare;
-	str_grouped_token(declare.var_name, var_name_token);
+	declare.var_name = var_name;
 	str_grouped_token(declare.var_type, var_type_token);
 	declare.scope_id = this_scope;
 	add_var_declare(var_check_lists.vd_list, var_check_lists.td_list,
@@ -407,6 +416,16 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	std::string var_name;
+	str_grouped_token(var_name, name_token);
+	std::string var_type_test = get_var_type(var_check_lists.vd_list,
+	                              var_name, var_check_lists.scope_tree,
+	                              this_scope);
+	
+	if (var_type_test != "") {
+		type_err_msg(name_token, FUNC_ALREADY_DECLARED, "", "");
+	}
+
 	FuncDeclare func_declare;
 	std::string func_type = "fn (";
 	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
@@ -476,7 +495,8 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
-	if (!is_primitive(return_type_branch.str)) {
+	if (!is_primitive(return_type_branch.str)
+	&& return_type_branch.str != "void") {
 		int index = get_type_declare_i(var_check_lists.td_list,
 									   return_type_branch.str);
 		if (index == -1) {
@@ -510,6 +530,13 @@ VarCheckLists &var_check_lists, int this_scope) {
 		else if (v.type == TYPE_MEMBER_LIST) {
 			type_member_list = v;
 		}
+	}
+
+	int test_index = get_type_declare_i(var_check_lists.td_list,
+	                                    name);
+	if (test_index != -1) {
+		type_err_msg(branch.branch_list[0],
+		             TYPE_ALREADY_DECLARED,"","");
 	}
 
 	TypeDeclare type_declare;

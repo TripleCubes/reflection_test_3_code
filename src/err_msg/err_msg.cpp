@@ -136,6 +136,15 @@ const std::string &type1, const std::string &type2) {
 	case TYPE_NOT_DECLARED:
 		s = " type not declared";
 		break;
+	case VAR_ALREADY_DECLARED:
+		s = " var already declared";
+		break;
+	case FUNC_ALREADY_DECLARED:
+		s = " function already declared";
+		break;
+	case TYPE_ALREADY_DECLARED:
+		s = " type already declared";
+		break;
 	case INCOMPATIBLE_INHERITANCE_TYPE:
 		s = " incompatible inherited type\n";
 		s += "expected '" + type1 + "' but got '" + type2 + "'";
