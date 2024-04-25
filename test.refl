@@ -1,7 +1,7 @@
 type A {
-	m: number = 10,
+	x: number = 10,
 }
 
-type A {
-	n: number = 10,
-}
+let a: A = {}
+a.x = 20
+a.b = 5

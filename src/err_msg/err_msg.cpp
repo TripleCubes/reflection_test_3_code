@@ -136,6 +136,12 @@ const std::string &type1, const std::string &type2) {
 	case TYPE_NOT_DECLARED:
 		s = " type not declared";
 		break;
+	case VAR_NOT_DECLARED:
+		s = " var not declared";
+		break;
+	case FUNC_NOT_DECLARED:
+		s = " func not declared";
+		break;
 	case VAR_ALREADY_DECLARED:
 		s = " var already declared";
 		break;

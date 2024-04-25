@@ -284,6 +284,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	                              this_scope);
 	if (var_type_test != "") {
 		type_err_msg(var_name_token, VAR_ALREADY_DECLARED, "", "");
+		return;
 	}
 
 	if (!is_primitive(var_type_token.str)) {
@@ -366,6 +367,11 @@ VarCheckLists &var_check_lists, int this_scope) {
 		var_check_lists.scope_tree,
 		this_scope);
 
+	if (var_type == "") {
+		type_err_msg(var_name_token, VAR_NOT_DECLARED, "", "");
+		return;
+	}
+
 	bool is_arr = false;
 	std::string check_type;
 
@@ -424,6 +430,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	
 	if (var_type_test != "") {
 		type_err_msg(name_token, FUNC_ALREADY_DECLARED, "", "");
+		return;
 	}
 
 	FuncDeclare func_declare;
@@ -537,6 +544,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	if (test_index != -1) {
 		type_err_msg(branch.branch_list[0],
 		             TYPE_ALREADY_DECLARED,"","");
+		return;
 	}
 
 	TypeDeclare type_declare;
