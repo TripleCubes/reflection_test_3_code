@@ -58,7 +58,8 @@ void add_var_declare(
 
 void print_declare_lists(
 	const std::vector<VarDeclare> &var_declare_list,
-	const std::vector<TypeDeclare> &type_declare_list);
+	const std::vector<TypeDeclare> &type_declare_list,
+	const std::vector<FuncDeclare> &func_declare_list);
 
 void print_scope_tree(const std::vector<int> &scope_tree);
 
