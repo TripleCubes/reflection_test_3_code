@@ -77,6 +77,7 @@ VarCheckLists &var_check_list, int this_scope) {
 		                    var_check_list.scope_tree,
 		                    this_scope);
 	}
+	return "";
 }
 
 std::vector<std::string> num_op_list = {
@@ -175,7 +176,7 @@ VarCheckLists &var_check_list, int this_scope) {
 			
 			if (!op_compatible(start_type, op_token.str)
 			|| !op_compatible(right_type, op_token.str)) {
-				type_err_msg(op_token, INCOMPATIBLE_OP);
+				type_err_msg(op_token, INCOMPATIBLE_OP, "", "");
 			}
 		}
 	}
@@ -202,7 +203,7 @@ VarCheckLists &var_check_list, int this_scope) {
 
 	if ((int)bracket.branch_list.size() - 1
 	!= (int)argv_type_list.size()) {
-		type_err_msg(bracket, INCOMPATIBLE_ARGV_NUM);
+		type_err_msg(bracket, INCOMPATIBLE_ARGV_NUM, "", "");
 		return return_type;
 	}
 
@@ -213,7 +214,7 @@ VarCheckLists &var_check_list, int this_scope) {
 		const std::string &argv_type = argv_type_list[i];
 
 		if (v_type != argv_type) {
-			type_err_msg(v, INCOMPATIBLE_TYPE);
+			type_err_msg(v, INCOMPATIBLE_TYPE, argv_type, v_type);
 		}
 	}
 
@@ -245,7 +246,8 @@ VarCheckLists &var_check_list, int this_scope) {
 	std::string var_type;
 	str_grouped_token(var_type, var_type_token);
 	if (right_side_type != var_type) {
-		type_err_msg(right_side, INCOMPATIBLE_TYPE);
+		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,
+		             right_side_type);
 	}
 
 	VarDeclare declare;

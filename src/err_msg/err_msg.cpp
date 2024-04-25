@@ -108,7 +108,8 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	exit(0);
 }
 
-void type_err_msg(const Branch &branch, TypeErrMsgType type) {
+void type_err_msg(const Branch &branch, TypeErrMsgType type,
+const std::string &type1, const std::string &type2) {
 	std::string s;
 	switch (type) {
 	case INCOMPATIBLE_OP:
@@ -118,7 +119,8 @@ void type_err_msg(const Branch &branch, TypeErrMsgType type) {
 		s = " incompatible number of arguments";
 		break;
 	case INCOMPATIBLE_TYPE:
-		s = " incompatible type";
+		s = " incompatible type\n";
+		s += "expected '" + type1 + "' but got '" + type2 + "'";
 		break;
 	default:
 		s = " type check unhandled";

@@ -30,7 +30,8 @@ enum TypeErrMsgType: int {
 };
 
 void err_msg(const Branch &branch, ErrMsgType type);
-void type_err_msg(const Branch &branch, TypeErrMsgType type);
+void type_err_msg(const Branch &branch, TypeErrMsgType type,
+	const std::string &type1, const std::string &type2);
 void err_msg_set_code_str(const std::string &in_code_str);
 std::string get_type_err_msg_str();
 

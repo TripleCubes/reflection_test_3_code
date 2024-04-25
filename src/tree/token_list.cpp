@@ -42,6 +42,7 @@ std::vector<std::string> keyword_list = {
 	"type", "from",
 	"number", "string", "bool", "void",
 	"return", "break", "continue",
+	"true", "false",
 };
 
 bool is_keyword(const std::string &str) {
