@@ -1,3 +1,3 @@
-let a: number[] = [10, 20, 30]
-let b: number[] = []
-b = a
+fn a(b: number, c: number) -> void
+	let x: number = false
+end
