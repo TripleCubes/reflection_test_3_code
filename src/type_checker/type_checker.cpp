@@ -621,6 +621,7 @@ VarCheckLists &var_check_lists, int parent_scope,
 CodeBlockType code_block_type,
 const std::string &return_type) {
 	int this_scope = (int)var_check_lists.scope_tree.size();
+	var_check_lists.scope_tree.push_back(parent_scope);
 
 	for (int i = 0; i < (int)code_block.branch_list.size(); i++) {
 		const Branch &v = code_block.branch_list[i];
