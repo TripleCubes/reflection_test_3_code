@@ -34,7 +34,7 @@ void get_argv_type_list(
 	std::vector<std::string> &argv_type_list,
 	const std::string &func_name,
 	const std::vector<VarDeclare> vd_list,
-	const std::vector<FuncDeclare> fd_list, 
+	const std::vector<FuncDeclare> fd_list,
 	int this_scope);
 
 std::string get_return_type(
@@ -46,6 +46,10 @@ std::string get_return_type(
 int get_type_declare_i(
 	const std::vector<TypeDeclare> &type_declare_list,
 	const std::string &type_name);
+
+bool type_compatible(const std::vector<TypeDeclare> &td_list,
+	const std::string &type1,
+	const std::string &type2);
 
 void add_var_declare(
 	std::vector<VarDeclare> &var_declare_list,

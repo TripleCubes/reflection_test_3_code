@@ -154,6 +154,29 @@ const std::string &type_name) {
 	return -1;
 }
 
+bool type_compatible(const std::vector<TypeDeclare> &td_list,
+const std::string &type1,
+const std::string &type2) {
+	if (type1 == type2) {
+		return true;
+	}
+	int index = get_type_declare_i(td_list, type2);
+	if (index == -1) {
+		return false;
+	}
+	while (true) {
+		std::string inherit = td_list[index].inherit;
+		if (inherit == type1) {
+			return true;
+		}
+		if (inherit == "") {
+			return false;
+		}
+		index = get_type_declare_i(td_list, inherit);
+	}
+	return false;
+}
+
 void add_var_declare(
 std::vector<VarDeclare> &var_declare_list,
 const std::vector<TypeDeclare> &type_declare_list,

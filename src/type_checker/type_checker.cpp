@@ -85,10 +85,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 		return "bool";
 	}
 	else {
-		return get_var_type(var_check_lists.vd_list,
-		                    value_name,
-		                    var_check_lists.scope_tree,
-		                    this_scope);
+		std::string var_type = get_var_type(var_check_lists.vd_list,
+		                       value_name,
+		                       var_check_lists.scope_tree,
+		                       this_scope);
+		if (var_type == "") {
+			type_err_msg(value_token, VAR_NOT_DECLARED, "", "");
+		}
+		return var_type;
 	}
 	return "";
 }
@@ -232,7 +236,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 			var_check_lists, this_scope);
 		const std::string &argv_type = argv_type_list[i];
 
-		if (v_type != argv_type) {
+		if(!type_compatible(var_check_lists.td_list,argv_type,v_type)){
 			type_err_msg(v, INCOMPATIBLE_TYPE, argv_type, v_type);
 		}
 	}
@@ -328,7 +332,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	&& check_type == "[]") {
 		check_type = var_type;
 	}
-	if (check_type != var_type) {
+	if (!type_compatible(var_check_lists.td_list,var_type,check_type)){
 		if (is_primitive(var_type) || is_array) {
 			type_err_msg(right_side,INCOMPATIBLE_TYPE,
 			             var_type,check_type);
@@ -403,7 +407,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	&& check_type == "[]") {
 		check_type = var_type;
 	}
-	if (check_type != var_type) {
+	if (!type_compatible(var_check_lists.td_list,var_type,check_type)){
 		type_err_msg(right_side,INCOMPATIBLE_TYPE,var_type,check_type);
 	}
 }
@@ -586,7 +590,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 			check_type = right_side_type;
 		}
 
-		if (check_type != type) {
+		if (!type_compatible(var_check_lists.td_list,type,check_type)){
 			if (is_primitive(type) || is_array) {
 				type_err_msg(right_side,INCOMPATIBLE_TYPE,
 							 type,check_type);

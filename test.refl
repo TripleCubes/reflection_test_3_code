@@ -1,3 +1,21 @@
-let a: number[] = [10, 20, 30]
-let x3z: number = 10
-a[x3z] = 5
+type A {
+	x: number = 0,
+}
+
+type B from A {
+	y: number = 0,
+}
+
+type C from B {
+	z: number = 0,
+}
+
+fn test(a: A) -> void
+	let x: B = {}
+end
+
+let a: A = {}
+test(a)
+
+let c: C = {}
+test(x)
