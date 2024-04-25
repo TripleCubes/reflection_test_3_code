@@ -3,11 +3,13 @@
 
 #include <string>
 #include <vector>
+#include "../tree/types.h"
 
 struct VarDeclare {
 	std::string var_name;
 	std::string var_type;
 	int scope_id = 0;
+	Branch branch;
 };
 
 struct TypeDeclare {

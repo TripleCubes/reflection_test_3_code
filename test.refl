@@ -1,9 +1,13 @@
 type A {
-	a: number = 10
+	a: string = "aaa",
+	b: string = 'bbb'
 }
-type B {
-	b: A = {},
+type B from A {
+	b: number = 20
+}
+type C from B {
+	c: number = 30,
 }
 
-let x: B = {}
-x.b.a = false
+let x: C = {}
+x.c = false

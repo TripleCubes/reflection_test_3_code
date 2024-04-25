@@ -1,6 +1,8 @@
 #include "var_check.h"
 
 #include <iostream>
+#include "../err_msg/err_msg.h"
+#include "../tree/types.h"
 
 namespace {
 bool is_in_scope(const std::vector<int> &scope_tree,
@@ -31,6 +33,48 @@ std::string replace_arr_index(const std::string &var_name) {
 	}
 
 	return result;
+}
+
+void get_type_declare_member_list(
+std::vector<VarDeclare> &result,
+const std::vector<TypeDeclare> &td_list, int index) {
+	auto is_in_list_and_more = [&result](
+	const VarDeclare var_declare) -> bool {
+		for (int i = 0; i < (int)result.size(); i++) {
+			const VarDeclare &v = result[i];
+			if (v.var_name == var_declare.var_name) {
+				if (v.var_type != var_declare.var_type) {
+					type_err_msg(v.branch,
+					             INCOMPATIBLE_INHERITANCE_TYPE,
+					             var_declare.var_type, v.var_type);
+				}
+				return true;
+			}
+		}
+		return false;
+	};
+
+	const TypeDeclare &type_declare = td_list[index];
+	for (int i = 0; i < (int)type_declare.member_list.size(); i++) {
+		const VarDeclare &member = type_declare.member_list[i];
+		if (is_in_list_and_more(member)) {
+			continue;
+		}
+
+		result.push_back(member);
+	}
+
+	if (type_declare.inherit == "") {
+		return;
+	}
+	
+	for (int i = 0; i < (int)td_list.size(); i++) {
+		const TypeDeclare &v = td_list[i];
+		if (type_declare.inherit == v.type_name) {
+			get_type_declare_member_list(
+				result, td_list, i);
+		}
+	}
 }
 }
 
@@ -123,11 +167,12 @@ VarDeclare declare) {
 		return;
 	}
 
-	const TypeDeclare &type_declare
-	                  = type_declare_list[index];
-	for (int i = 0; i < (int)type_declare.member_list.size(); i++) {
+	std::vector<VarDeclare> m_list;
+	get_type_declare_member_list(m_list, type_declare_list, index);
+
+	for (int i = 0; i < (int)m_list.size(); i++) {
 		const VarDeclare &member
-		                 = type_declare.member_list[i];
+		                 = m_list[i];
 		VarDeclare new_var_declare;
 		new_var_declare.var_name = declare.var_name
 		                           + "." + member.var_name;

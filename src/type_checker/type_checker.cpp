@@ -560,6 +560,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 		VarDeclare var_declare;
 		str_grouped_token(var_declare.var_name, v.branch_list[0]);
 		var_declare.var_type = type;
+		var_declare.branch = v.branch_list[1];
 		type_declare.member_list.push_back(var_declare);
 	}
 

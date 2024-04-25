@@ -136,6 +136,10 @@ const std::string &type1, const std::string &type2) {
 	case TYPE_NOT_DECLARED:
 		s = " type not declared";
 		break;
+	case INCOMPATIBLE_INHERITANCE_TYPE:
+		s = " incompatible inherited type\n";
+		s += "expected '" + type1 + "' but got '" + type2 + "'";
+		break;
 	default:
 		s = " type check unhandled";
 		break;
