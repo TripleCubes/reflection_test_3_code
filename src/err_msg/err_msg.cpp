@@ -17,7 +17,12 @@ std::string err_line(int line) {
 			current_line++;
 		}
 		else if (current_line == line) {
-			result += c;
+			if (c == '\t') {
+				result += ' ';
+			}
+			else {
+				result += c;
+			}
 		}
 	}
 	return result;

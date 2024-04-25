@@ -12,6 +12,7 @@ struct VarDeclare {
 
 struct TypeDeclare {
 	std::string type_name;
+	std::string inherit;
 	std::vector<VarDeclare> member_list;
 };
 

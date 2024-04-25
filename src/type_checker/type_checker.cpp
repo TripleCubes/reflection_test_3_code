@@ -441,6 +441,72 @@ VarCheckLists &var_check_lists, int this_scope) {
 	                 return_type);
 }
 
+void typenew_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	std::string name;
+	std::string inherit;
+	Branch type_member_list;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+		if (i == 0) {
+			str_grouped_token(name, v);
+		}
+		else if (i == 1) {
+			if (v.type != NONE) {
+				str_grouped_token(inherit, v);
+			}
+		}
+		else if (v.type == TYPE_MEMBER_LIST) {
+			type_member_list = v;
+		}
+	}
+
+	TypeDeclare type_declare;
+	type_declare.type_name = name;
+	type_declare.inherit = inherit;
+
+	for (int i = 0; i < (int)type_member_list.branch_list.size(); i++){
+		const Branch &v = type_member_list.branch_list[i];
+		std::string type;
+		str_grouped_token(type, v.branch_list[1]);
+
+		const Branch right_side = v.branch_list[3];
+		std::string check_type;
+
+		bool is_array = false;
+		const Branch &first_calc = right_side.branch_list[0]
+											 .branch_list[0];
+		if (first_calc.type == BRACKET_SQUARE) {
+			is_array = true;
+		}
+
+		if (is_array)
+		{
+			std::string array_type
+			= get_array_type(right_side, var_check_lists, this_scope);
+
+			check_type = array_type;
+		}
+		else {
+			std::string right_side_type = get_round_bracket_value_type(
+				right_side, var_check_lists, this_scope);
+			check_type = right_side_type;
+		}
+
+		if (check_type != type) {
+			type_err_msg(right_side,INCOMPATIBLE_TYPE,type,check_type);
+		}
+		
+		VarDeclare var_declare;
+		str_grouped_token(var_declare.var_name, v.branch_list[0]);
+		var_declare.var_type = type;
+		type_declare.member_list.push_back(var_declare);
+	}
+
+	var_check_lists.td_list.push_back(type_declare);
+}
+
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
 const std::string &return_type) {
@@ -465,6 +531,9 @@ const std::string &return_type) {
 		else if (v.type == FUNCNEW) {
 			funcnew_check(v, var_check_lists, this_scope);
 		}
+		else if (v.type == TYPE) {
+			typenew_check(v, var_check_lists, this_scope);
+		}
 	}
 }
 }
@@ -474,5 +543,6 @@ void type_check(const Branch &tree) {
 	code_block_check(tree, var_check_lists, -1, "void");
 	print_declare_lists(var_check_lists.vd_list,
 	                    var_check_lists.td_list);
+	print_scope_tree(var_check_lists.scope_tree);
 	std::cout << std::endl;
 }

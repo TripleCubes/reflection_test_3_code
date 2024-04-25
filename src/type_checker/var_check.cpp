@@ -144,7 +144,8 @@ const std::vector<VarDeclare> &var_declare_list,
 const std::vector<TypeDeclare> &type_declare_list) {
 	for (int i = 0; i < (int)type_declare_list.size(); i++) {
 		TypeDeclare v = type_declare_list[i];
-		std::cout << v.type_name << std::endl;
+		std::cout << i << " " << v.type_name 
+			<< " " << v.inherit << std::endl;
 		for (int j = 0; j < (int)v.member_list.size(); j++) {
 			VarDeclare vv = v.member_list[j];
 			std::cout << "    "
@@ -157,13 +158,14 @@ const std::vector<TypeDeclare> &type_declare_list) {
 
 	for (int i = 0; i < (int)var_declare_list.size(); i++) {
 		VarDeclare v = var_declare_list[i];
-		std::cout << v.var_name << " " << v.var_type
+		std::cout << i << " " << v.var_name << " " << v.var_type
 			<< " " << v.scope_id << std::endl;
 	}
 }
 
 void print_scope_tree(const std::vector<int> &scope_tree) {
 	for (int i = 0; i < (int)scope_tree.size(); i++) {
-		std::cout << scope_tree[i] << " <- " << i << std::endl;
+		std::cout << i << " " << scope_tree[i] << " <- " << i;
+		std::cout << std::endl;
 	}
 }
