@@ -73,8 +73,11 @@ const std::vector<TypeDeclare> &td_list, int index) {
 		if (type_declare.inherit == v.type_name) {
 			get_type_declare_member_list(
 				result, td_list, i);
+			return;
 		}
 	}
+
+	type_err_msg(type_declare.inherit_branch, TYPE_NOT_DECLARED,"","");
 }
 }
 

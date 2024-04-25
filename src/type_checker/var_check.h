@@ -16,6 +16,7 @@ struct TypeDeclare {
 	std::string type_name;
 	std::string inherit;
 	std::vector<VarDeclare> member_list;
+	Branch inherit_branch;
 };
 
 struct FuncDeclare {

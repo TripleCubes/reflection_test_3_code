@@ -550,6 +550,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 	TypeDeclare type_declare;
 	type_declare.type_name = name;
 	type_declare.inherit = inherit;
+	type_declare.inherit_branch = branch.branch_list[1];
 
 	for (int i = 0; i < (int)type_member_list.branch_list.size(); i++){
 		const Branch &v = type_member_list.branch_list[i];

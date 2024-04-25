@@ -1,4 +1,8 @@
-type A {
+type B {
+	m: string = "aaaa",
+}
+
+type A from B {
 	x: number = 10,
 }
 
