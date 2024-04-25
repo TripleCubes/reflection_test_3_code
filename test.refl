@@ -1,8 +1,2 @@
-type A from B {
-	m: number = test(),
-	n: number = 0,
-}
-
-fn test() -> string
-	return 0
+fn a(m: A[], n: A) -> A
 end

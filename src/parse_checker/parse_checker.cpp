@@ -318,7 +318,8 @@ void argument_list_check(const Branch &token_list, int start, int end){
 			prev = token_list.branch_list[i - 1];
 		}
 
-		if (v.type == NAME && nx.str != ":") {
+		if (v.type == NAME && (prev.str == "," || i == 0)
+		&& nx.str != ":") {
 			err_msg(v, EXPECT_COLON);
 		}
 

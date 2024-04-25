@@ -3,12 +3,19 @@
 #include "../tree/types.h"
 #include "../err_msg/err_msg.h"
 #include "var_check.h"
+#include "../tree/var_types.h"
 #include <vector>
 #include <string>
 
 #include <iostream>
 
 namespace {
+enum CodeBlockType: int {
+	BLOCK_FUNC,
+	BLOCK_LOOP,
+	BLOCK_IF,
+};
+
 struct VarCheckLists {
 	std::vector<VarDeclare> vd_list;
 	std::vector<TypeDeclare> td_list;
@@ -270,6 +277,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	if (!is_primitive(var_type_token.str)) {
+		int index = get_type_declare_i(var_check_lists.td_list,
+		                               var_type_token.str);
+		if (index == -1) {
+			type_err_msg(var_type_token, TYPE_NOT_DECLARED, "", "");
+		}
+	}
+
 	std::string var_type;
 	str_grouped_token(var_type, var_type_token);
 	std::string check_type;
@@ -416,17 +431,22 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
+CodeBlockType code_block_type,
 const std::string &return_type);
 
 void funcnew_check(const Branch &branch,
 VarCheckLists &var_check_lists, int this_scope) {
+	Branch argv_branch;
 	Branch return_type_branch;
 	Branch code_block;
 
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		const Branch &v = branch.branch_list[i];
-
-		if (v.type == RETURN_TYPES) {
+		
+		if (v.type == FUNCNEW_ARGV) {
+			argv_branch = v;
+		}
+		else if (v.type == RETURN_TYPES) {
 			return_type_branch = v.branch_list[0];
 		}
 		else if (v.type == CODE_BLOCK) {
@@ -434,11 +454,32 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
+		const Branch &v = argv_branch.branch_list[i];
+		const Branch &var_type = v.branch_list[1];
+		
+		if (!is_primitive(var_type.str)) {
+			int index = get_type_declare_i(var_check_lists.td_list,
+										   var_type.str);
+			if (index == -1) {
+				type_err_msg(var_type, TYPE_NOT_DECLARED, "", "");
+			}
+		}
+	}
+
+	if (!is_primitive(return_type_branch.str)) {
+		int index = get_type_declare_i(var_check_lists.td_list,
+									   return_type_branch.str);
+		if (index == -1) {
+			type_err_msg(return_type_branch,TYPE_NOT_DECLARED, "", "");
+		}
+	}
+
 	std::string return_type;
 	str_grouped_token(return_type, return_type_branch);
 
 	code_block_check(code_block, var_check_lists, this_scope,
-	                 return_type);
+	                 BLOCK_FUNC, return_type);
 }
 
 void typenew_check(const Branch &branch,
@@ -509,6 +550,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
+CodeBlockType code_block_type,
 const std::string &return_type) {
 	int this_scope = (int)var_check_lists.scope_tree.size();
 
@@ -540,7 +582,7 @@ const std::string &return_type) {
 
 void type_check(const Branch &tree) {
 	VarCheckLists var_check_lists;
-	code_block_check(tree, var_check_lists, -1, "void");
+	code_block_check(tree, var_check_lists, -1, BLOCK_FUNC, "void");
 	print_declare_lists(var_check_lists.vd_list,
 	                    var_check_lists.td_list);
 	print_scope_tree(var_check_lists.scope_tree);

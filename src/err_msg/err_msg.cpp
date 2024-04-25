@@ -133,6 +133,9 @@ const std::string &type1, const std::string &type2) {
 		s = " incompatible type\n";
 		s += "expected '" + type1 + "' but got '" + type2 + "'";
 		break;
+	case TYPE_NOT_DECLARED:
+		s = " type not declared";
+		break;
 	default:
 		s = " type check unhandled";
 		break;

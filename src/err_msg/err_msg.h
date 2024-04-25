@@ -29,6 +29,7 @@ enum TypeErrMsgType: int {
 	INCOMPATIBLE_OP,
 	INCOMPATIBLE_ARGV_NUM,
 	INCOMPATIBLE_TYPE,
+	TYPE_NOT_DECLARED,
 };
 
 void err_msg(const Branch &branch, ErrMsgType type);
