@@ -1,13 +1,20 @@
-fn test(a: number, b: number) -> void
+fn test(a: number, b: number) -> number
 	a = 10
 	let x : number = 10
 	
 	if true then
 	end
 
-	let hello: fn = fn(m: number) -> void
+	let hello: fn = fn(m: number) -> string
 		let d: number = 2
 		m = 8
+		return "hello"
 	end
+
+	hello = fn(x: number) -> string
+		return ""
+	end
+
+	return 10
 end
 

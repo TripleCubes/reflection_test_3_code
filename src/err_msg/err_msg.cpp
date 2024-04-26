@@ -157,6 +157,9 @@ const std::string &type1, const std::string &type2) {
 	case CANT_BREAK:
 		s = " can only break inside a loop";
 		break;
+	case MUST_RETURN_END_OF_FUNC:
+		s = " must return at end of function";
+		break;
 	case INCOMPATIBLE_INHERITANCE_TYPE:
 		s = " incompatible inherited type\n";
 		s += "expected '" + type1 + "' but got '" + type2 + "'";

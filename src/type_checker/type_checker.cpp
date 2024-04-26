@@ -586,6 +586,20 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	code_block_check(code_block, var_check_lists, this_scope,
 	                 BLOCK_FUNC, return_type);
+
+	if (return_type == "void") {
+		return;
+	}
+
+	int cb_sz = (int)code_block.branch_list.size();
+	if (cb_sz == 0) {
+		type_err_msg(code_block, MUST_RETURN_END_OF_FUNC, "", "");
+		return;
+	}
+	const Branch &last_command = code_block.branch_list[cb_sz - 1];
+	if (last_command.type != RETURN) {
+		type_err_msg(last_command, MUST_RETURN_END_OF_FUNC, "", "");
+	}
 }
 
 void typenew_check(const Branch &branch,
@@ -793,6 +807,20 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	code_block_check(code_block, var_check_lists, this_scope,
 	                 BLOCK_FUNC, return_type);
+
+	if (return_type == "void") {
+		return;
+	}
+
+	int cb_sz = (int)code_block.branch_list.size();
+	if (cb_sz == 0) {
+		type_err_msg(code_block, MUST_RETURN_END_OF_FUNC, "", "");
+		return;
+	}
+	const Branch &last_command = code_block.branch_list[cb_sz - 1];
+	if (last_command.type != RETURN) {
+		type_err_msg(last_command, MUST_RETURN_END_OF_FUNC, "", "");
+	}
 }
 
 void lambda_assign_check(const Branch &branch,
@@ -827,6 +855,39 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
+		const Branch &v = argv_branch.branch_list[i];
+		const Branch &var_name = v.branch_list[0];
+		const Branch &var_type = v.branch_list[1];
+		
+		if (!is_primitive(var_type.str)) {
+			int index = get_type_declare_i(var_check_lists.td_list,
+										   var_type.str);
+			if (index == -1) {
+				type_err_msg(var_type, TYPE_NOT_DECLARED, "", "");
+			}
+		}
+
+		std::string var_name_str;
+		str_grouped_token(var_name_str, var_name);
+		std::string search_type = get_var_type(
+			var_check_lists.vd_list, var_name_str,
+			var_check_lists.scope_tree, this_scope);
+		if (search_type != "") {
+			type_err_msg(v, VAR_ALREADY_DECLARED, "", "");
+		}
+
+		VarDeclare var_declare;
+		var_declare.var_name = var_name_str;
+		str_grouped_token(var_declare.var_type, var_type);
+		int nx_scope_id = (int)var_check_lists.scope_tree.size();
+		var_declare.scope_id = nx_scope_id;
+		var_declare.branch = v;
+		add_var_declare(
+			var_check_lists.vd_list, var_check_lists.td_list,
+			var_declare);
+	}
+
 	std::string type;
 	str_grouped_token(type, var_type_branch);
 	std::string name;
@@ -843,6 +904,20 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	code_block_check(code_block, var_check_lists, this_scope,
 	                 BLOCK_FUNC, return_type);
+
+	if (return_type == "void") {
+		return;
+	}
+
+	int cb_sz = (int)code_block.branch_list.size();
+	if (cb_sz == 0) {
+		type_err_msg(code_block, MUST_RETURN_END_OF_FUNC, "", "");
+		return;
+	}
+	const Branch &last_command = code_block.branch_list[cb_sz - 1];
+	if (last_command.type != RETURN) {
+		type_err_msg(last_command, MUST_RETURN_END_OF_FUNC, "", "");
+	}
 }
 
 void if_check(const Branch &branch,
