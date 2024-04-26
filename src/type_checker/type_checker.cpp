@@ -541,6 +541,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
 		const Branch &v = argv_branch.branch_list[i];
+		const Branch &var_name = v.branch_list[0];
 		const Branch &var_type = v.branch_list[1];
 		
 		if (!is_primitive(var_type.str)) {
@@ -549,6 +550,15 @@ VarCheckLists &var_check_lists, int this_scope) {
 			if (index == -1) {
 				type_err_msg(var_type, TYPE_NOT_DECLARED, "", "");
 			}
+		}
+
+		std::string var_name_str;
+		str_grouped_token(var_name_str, var_name);
+		std::string search_type = get_var_type(
+			var_check_lists.vd_list, var_name_str,
+			var_check_lists.scope_tree, this_scope);
+		if (search_type != "") {
+			type_err_msg(v, VAR_ALREADY_DECLARED, "", "");
 		}
 	}
 
@@ -728,6 +738,7 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
 		const Branch &v = argv_branch.branch_list[i];
+		const Branch &var_name = v.branch_list[0];
 		const Branch &var_type = v.branch_list[1];
 		
 		if (!is_primitive(var_type.str)) {
@@ -736,6 +747,15 @@ VarCheckLists &var_check_lists, int this_scope) {
 			if (index == -1) {
 				type_err_msg(var_type, TYPE_NOT_DECLARED, "", "");
 			}
+		}
+
+		std::string var_name_str;
+		str_grouped_token(var_name_str, var_name);
+		std::string search_type = get_var_type(
+			var_check_lists.vd_list, var_name_str,
+			var_check_lists.scope_tree, this_scope);
+		if (search_type != "") {
+			type_err_msg(v, VAR_ALREADY_DECLARED, "", "");
 		}
 	}
 
@@ -994,7 +1014,7 @@ void break_check(const Branch &branch,
 VarCheckLists &var_check_lists, int this_scope) {
 	if (this_scope == 0) {
 		type_err_msg(branch, CANT_BREAK, "", "");
-		return
+		return;
 	}
 	if (!can_break(var_check_lists, this_scope)) {
 		type_err_msg(branch, CANT_BREAK, "", "");

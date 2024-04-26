@@ -1,7 +1,9 @@
-fn a() -> number
-	for i = 1, 2, 3 do
-		continue
-	end
+let a: string = ""
+
+let test: fn = fn(a: number, b: number) -> void
+	let x: number = 0
 end
-fn b() -> void
+
+fn test2() -> void
+	let x: number = 10
 end
