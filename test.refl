@@ -1,2 +1,5 @@
-let x: bool
+let x: bool = false
 let a: number = 10 + 5 * -(x)
+
+for i, v in list do
+end
