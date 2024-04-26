@@ -426,6 +426,37 @@ void elseif_check(const Branch &token_list, int start, int end) {
 		}
 	}
 }
+
+void for_check(const Branch &token_list, int start, int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 8) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start + 1].type != NAME) {
+		err_msg(bl[start + 1], CANT_PARSE);
+	}
+
+	if (bl[start + 2].str != "=") {
+		err_msg(bl[start + 2], CANT_PARSE);
+	}
+
+	int right_side_start = start + 3;
+	int right_side_end = 0;
+	for (int i = right_side_start; i <= end; i++) {
+		if (i == end) {
+			err_msg(bl[right_side_start], CANT_PARSE);
+		}
+
+		if (bl[i].str == "do") {
+			right_side_end = i - 1;
+			break;
+		}
+	}
+
+	right_side_check(token_list,right_side_start,right_side_end,true);
+}
 }
 
 void parse_check(const Branch &token_list, BranchType branch_type,
@@ -447,5 +478,8 @@ int start, int end) {
 	}
 	else if (branch_type == ELSEIF) {
 		elseif_check(token_list, start, end);
+	}
+	else if (branch_type == FOR) {
+		for_check(token_list, start, end);
 	}
 }

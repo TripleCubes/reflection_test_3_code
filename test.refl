@@ -1,20 +1,2 @@
-fn test(a: number, b: number) -> number
-	a = 10
-	let x : number = 10
-	
-	if true then
-	end
-
-	let hello: fn = fn(m: number) -> string
-		let d: number = 2
-		m = 8
-		return "hello"
-	end
-
-	hello = fn(x: number) -> string
-		return ""
-	end
-
-	return 10
+for i = 1, 10, 1 do
 end
-
