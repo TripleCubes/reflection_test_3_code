@@ -560,6 +560,16 @@ VarCheckLists &var_check_lists, int this_scope) {
 		if (search_type != "") {
 			type_err_msg(v, VAR_ALREADY_DECLARED, "", "");
 		}
+
+		VarDeclare var_declare;
+		var_declare.var_name = var_name_str;
+		str_grouped_token(var_declare.var_type, var_type);
+		int nx_scope_id = (int)var_check_lists.scope_tree.size();
+		var_declare.scope_id = nx_scope_id;
+		var_declare.branch = v;
+		add_var_declare(
+			var_check_lists.vd_list, var_check_lists.td_list,
+			var_declare);
 	}
 
 	if (!is_primitive(return_type_branch.str)
@@ -757,6 +767,16 @@ VarCheckLists &var_check_lists, int this_scope) {
 		if (search_type != "") {
 			type_err_msg(v, VAR_ALREADY_DECLARED, "", "");
 		}
+
+		VarDeclare var_declare;
+		var_declare.var_name = var_name_str;
+		str_grouped_token(var_declare.var_type, var_type);
+		int nx_scope_id = (int)var_check_lists.scope_tree.size();
+		var_declare.scope_id = nx_scope_id;
+		var_declare.branch = v;
+		add_var_declare(
+			var_check_lists.vd_list, var_check_lists.td_list,
+			var_declare);
 	}
 
 	if (!is_primitive(return_type_branch.str)
