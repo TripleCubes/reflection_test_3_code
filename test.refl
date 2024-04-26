@@ -1,2 +1,2 @@
-for i = 1, 10, 1 do
-end
+let x: bool
+let a: number = 10 + 5 * -(x)

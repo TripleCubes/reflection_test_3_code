@@ -104,6 +104,21 @@ VarCheckLists &var_check_lists, int this_scope) {
 		return get_funccall_bracket_value_type(value_token,
 			var_check_lists, this_scope);
 	}
+	else if (value_token.type == REVERSED) {
+		std::string type = get_calc_value_type(
+			value_token.branch_list[0],
+		    var_check_lists, this_scope);
+		std::string reversed_str = value_token.branch_list[1].str;
+		if (reversed_str == "-" && type != "number") {
+			type_err_msg(value_token.branch_list[0],
+				INCOMPATIBLE_TYPE,"number",type);
+		}
+		if (reversed_str=="not" && type != "bool") {
+			type_err_msg(value_token.branch_list[0],
+				INCOMPATIBLE_TYPE, "bool",type);
+		}
+		return type;
+	}
 	else if (value_token.type == BRACKET_SQUARE) {
 		return "[]";
 	}

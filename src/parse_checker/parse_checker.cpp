@@ -65,7 +65,7 @@ bool is_next_to_value(const Branch &nx) {
 
 bool is_next_to_op(const Branch &nx, const Branch &nx_nx) {
 	if (is_value(nx)
-	|| (is_reverse_op(nx) && is_value(nx_nx))
+	|| (is_reverse_op(nx) && (is_value(nx_nx) || nx_nx.str == "("))
 	|| nx.str == "(") {
 		return true;
 	}
