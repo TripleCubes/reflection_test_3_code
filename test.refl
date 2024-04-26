@@ -1,21 +1,10 @@
-type A {
-	x: number = 0,
-}
-
-type B from A {
-	y: number = 0,
-}
-
-type C from B {
-	z: number = 0,
-}
-
-fn test(a: A) -> void
-	let x: B = {}
+let test: fn = fn(a: number, b: number) -> void
+	let x: number = 10
 end
 
-let a: A = {}
-test(a)
+let m: number = 0
 
-let c: C = {}
-test(x)
+test = fn(a: number, b: number) -> void
+	let y: number = 10
+	m = 2
+end

@@ -620,6 +620,151 @@ VarCheckLists &var_check_lists, int this_scope) {
 		var_check_lists, this_scope);
 }
 
+void lambda_new_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch var_type_branch;
+	Branch name_token;
+	Branch argv_branch;
+	Branch return_type_branch;
+	Branch code_block;
+	
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+		if (v.type == NAME) {
+			name_token = v;
+		}
+		else if (v.type == VAR_TYPE) {
+			var_type_branch = v;
+		}
+		else if (v.type == LAMBDA_RIGHT_SIDE) {
+			for (int j = 0; j < (int)v.branch_list.size(); j++) {
+				const Branch &vv = v.branch_list[j];
+				if (vv.type == FUNCNEW_ARGV) {
+					argv_branch = vv;
+				}
+				else if (vv.type == RETURN_TYPES) {
+					return_type_branch = vv.branch_list[0];
+				}
+				else if (vv.type == CODE_BLOCK) {
+					code_block = vv;
+				}
+			}
+		}
+	}
+
+	std::string var_name;
+	str_grouped_token(var_name, name_token);
+	std::string var_type_test = get_var_type(var_check_lists.vd_list,
+	                              var_name, var_check_lists.scope_tree,
+	                              this_scope);
+	
+	if (var_type_test != "") {
+		type_err_msg(name_token, FUNC_ALREADY_DECLARED, "", "");
+		return;
+	}
+
+	FuncDeclare func_declare;
+	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
+		const Branch &v = argv_branch.branch_list[i];
+		std::string type_str;
+		str_grouped_token(type_str, v.branch_list[1]);
+
+		func_declare.argv.push_back(type_str);
+	}
+
+	VarDeclare var_declare;
+	str_grouped_token(var_declare.var_name, name_token);
+	str_grouped_token(var_declare.var_type, var_type_branch);
+	var_declare.scope_id = this_scope;
+	add_var_declare(var_check_lists.vd_list,
+	                var_check_lists.td_list,
+	                var_declare);
+
+	func_declare.var_declare_index
+		= (int)var_check_lists.vd_list.size() - 1;
+	str_grouped_token(func_declare.return_type, return_type_branch);
+	var_check_lists.fd_list.push_back(func_declare);
+
+
+	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
+		const Branch &v = argv_branch.branch_list[i];
+		const Branch &var_type = v.branch_list[1];
+		
+		if (!is_primitive(var_type.str)) {
+			int index = get_type_declare_i(var_check_lists.td_list,
+										   var_type.str);
+			if (index == -1) {
+				type_err_msg(var_type, TYPE_NOT_DECLARED, "", "");
+			}
+		}
+	}
+
+	if (!is_primitive(return_type_branch.str)
+	&& return_type_branch.str != "void") {
+		int index = get_type_declare_i(var_check_lists.td_list,
+									   return_type_branch.str);
+		if (index == -1) {
+			type_err_msg(return_type_branch,TYPE_NOT_DECLARED, "", "");
+		}
+	}
+
+	std::string return_type;
+	str_grouped_token(return_type, return_type_branch);
+
+	code_block_check(code_block, var_check_lists, this_scope,
+	                 BLOCK_FUNC, return_type);
+}
+
+void lambda_assign_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch var_type_branch;
+	Branch name_token;
+	Branch argv_branch;
+	Branch return_type_branch;
+	Branch code_block;
+	
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+		if (v.type == NAME) {
+			name_token = v;
+		}
+		else if (v.type == VAR_TYPE) {
+			var_type_branch = v;
+		}
+		else if (v.type == LAMBDA_RIGHT_SIDE) {
+			for (int j = 0; j < (int)v.branch_list.size(); j++) {
+				const Branch &vv = v.branch_list[j];
+				if (vv.type == FUNCNEW_ARGV) {
+					argv_branch = vv;
+				}
+				else if (vv.type == RETURN_TYPES) {
+					return_type_branch = vv.branch_list[0];
+				}
+				else if (vv.type == CODE_BLOCK) {
+					code_block = vv;
+				}
+			}
+		}
+	}
+
+	std::string type;
+	str_grouped_token(type, var_type_branch);
+	std::string name;
+	str_grouped_token(name, name_token);
+	std::string searched_type = get_var_type(
+		var_check_lists.vd_list, name,
+		var_check_lists.scope_tree, this_scope);
+	if (searched_type != type) {
+		type_err_msg(name_token, INCOMPATIBLE_TYPE,searched_type,type);
+	}
+
+	std::string return_type;
+	str_grouped_token(return_type, return_type_branch);
+
+	code_block_check(code_block, var_check_lists, this_scope,
+	                 BLOCK_FUNC, return_type);
+}
+
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
 CodeBlockType code_block_type,
@@ -651,6 +796,12 @@ const std::string &return_type) {
 		}
 		else if (v.type == FUNCCALL) {
 			funccall_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == LAMBDA_NEW) {
+			lambda_new_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == LAMBDA_ASSIGN) {
+			lambda_assign_check(v, var_check_lists, this_scope);
 		}
 	}
 }
