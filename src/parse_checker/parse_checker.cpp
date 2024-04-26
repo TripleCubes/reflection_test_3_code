@@ -409,6 +409,23 @@ void if_check(const Branch &token_list, int start, int end) {
 
 	right_side_check(token_list, start + 1, then_pos - 1, false);
 }
+
+void elseif_check(const Branch &token_list, int start, int end) {
+	if (sz(start, end) < 3) {
+		err_msg(token_list.branch_list[start], CANT_PARSE);
+	}
+
+	for (int i = start + 1; i <= end; i++) {
+		const Branch &v = token_list.branch_list[i];
+		if (v.str == "then") {
+			break;
+		}
+
+		if (i == end) {
+			err_msg(token_list.branch_list[start], CANT_PARSE);
+		}
+	}
+}
 }
 
 void parse_check(const Branch &token_list, BranchType branch_type,
@@ -429,6 +446,6 @@ int start, int end) {
 		if_check(token_list, start, end);
 	}
 	else if (branch_type == ELSEIF) {
-		if_check(token_list, start, end);
+		elseif_check(token_list, start, end);
 	}
 }

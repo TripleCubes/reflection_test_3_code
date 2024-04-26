@@ -151,6 +151,12 @@ const std::string &type1, const std::string &type2) {
 	case TYPE_ALREADY_DECLARED:
 		s = " name already declared";
 		break;
+	case CONTINUE_UNSUPPORTED:
+		s = " continue is not supported, yet";
+		break;
+	case CANT_BREAK:
+		s = " can only break inside a loop";
+		break;
 	case INCOMPATIBLE_INHERITANCE_TYPE:
 		s = " incompatible inherited type\n";
 		s += "expected '" + type1 + "' but got '" + type2 + "'";

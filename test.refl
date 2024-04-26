@@ -1,10 +1,7 @@
-let test: fn = fn(a: number, b: number) -> void
-	let x: number = 10
+fn a() -> number
+	for i = 1, 2, 3 do
+		continue
+	end
 end
-
-let m: number = 0
-
-test = fn(a: number, b: number) -> void
-	let y: number = 10
-	m = 2
+fn b() -> void
 end

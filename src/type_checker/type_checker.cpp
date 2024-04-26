@@ -16,12 +16,52 @@ enum CodeBlockType: int {
 	BLOCK_IF,
 };
 
+std::vector<std::string> code_block_return_type_list;
+
 struct VarCheckLists {
 	std::vector<VarDeclare> vd_list;
 	std::vector<TypeDeclare> td_list;
 	std::vector<FuncDeclare> fd_list;
 	std::vector<int> scope_tree;
 };
+
+std::string get_nearest_return_type(
+const VarCheckLists &var_check_lists, int this_scope) {
+	while (true) {
+		std::string return_type
+		            = code_block_return_type_list[this_scope];
+		int parent_scope = var_check_lists.scope_tree[this_scope];
+
+		if (return_type == "is BLOCK_IF"
+		|| return_type == "is BLOCK_LOOP") {
+			this_scope = parent_scope;
+		}
+		else {
+			return return_type;
+		}
+	}
+	return "";
+}
+
+bool can_break(
+const VarCheckLists &var_check_lists, int this_scope) {
+	while (true) {
+		std::string return_type
+		            = code_block_return_type_list[this_scope];
+		int parent_scope = var_check_lists.scope_tree[this_scope];
+
+		if (return_type == "is BLOCK_IF") {
+			this_scope = parent_scope;
+		}
+		else if (return_type == "is BLOCK_LOOP") {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	return false;
+}
 
 void str_grouped_token(std::string &result, const Branch &token) {
 	if (token.str != "") {
@@ -765,12 +805,217 @@ VarCheckLists &var_check_lists, int this_scope) {
 	                 BLOCK_FUNC, return_type);
 }
 
+void if_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch cond;
+	Branch code_block;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+
+		if (v.type == BRACKET_ROUND) {
+			cond = v;
+		}
+		else if (v.type == CODE_BLOCK) {
+			code_block = v;
+		}
+	}
+
+	std::string cond_type = get_round_bracket_value_type(
+		cond, var_check_lists, this_scope);
+	if (cond_type != "bool") {
+		type_err_msg(cond, INCOMPATIBLE_TYPE, "bool", cond_type);
+	}
+
+	code_block_check(code_block, var_check_lists, this_scope,
+	                 BLOCK_IF, "");
+}
+
+void elseif_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch cond;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+
+		if (v.type == BRACKET_ROUND) {
+			cond = v;
+		}
+	}
+
+	std::string cond_type = get_round_bracket_value_type(
+		cond, var_check_lists, this_scope);
+	if (cond_type != "bool") {
+		type_err_msg(cond, INCOMPATIBLE_TYPE, "bool", cond_type);
+	}
+}
+
+void for_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch iter_name_token;
+	Branch funccall_token;
+	Branch code_block;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+
+		if (v.type == NAME) {
+			iter_name_token = v;
+		}
+		else if (v.type == BRACKET_FUNCCALL) {
+			funccall_token = v;
+		}
+		else if (v.type == CODE_BLOCK) {
+			code_block = v;
+		}
+	}
+
+	std::string iter_name;
+	str_grouped_token(iter_name, iter_name_token);
+	std::string iter_type = get_var_type(var_check_lists.vd_list,
+		iter_name, var_check_lists.scope_tree, this_scope);
+	if (iter_type != "") {
+		type_err_msg(iter_name_token, VAR_ALREADY_DECLARED, "", "");
+	}
+
+	for (int i = 0; i < (int)funccall_token.branch_list.size()-1;i++) {
+		const Branch &v = funccall_token.branch_list[i];
+		const Branch &calc = v.branch_list[0];
+
+		std::string calc_type = get_calc_value_type(calc,
+			var_check_lists, this_scope);
+
+		if (calc_type != "number") {
+			type_err_msg(v, INCOMPATIBLE_TYPE, "number", calc_type);
+		}
+	}
+
+	code_block_check(code_block, var_check_lists, this_scope,
+		BLOCK_LOOP, "");
+}
+
+void foreach_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch iter_token;
+	Branch val_token;
+	Branch list_token;
+	Branch code_block;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+		if (i == 0) {
+			iter_token = v;
+		}
+		else if (i == 1) {
+			val_token = v;
+		}
+		else if (i == 2) {
+			list_token = v;
+		}
+		else if (v.type == CODE_BLOCK) {
+			code_block = v;
+		}
+	}
+
+	std::string iter_name;
+	str_grouped_token(iter_name, iter_token);
+	std::string val_name;
+	str_grouped_token(val_name, val_token);
+	std::string list_name;
+	str_grouped_token(list_name, list_token);
+
+	std::string iter_type = get_var_type(var_check_lists.vd_list,
+		iter_name, var_check_lists.scope_tree, this_scope);
+	std::string val_type = get_var_type(var_check_lists.vd_list,
+		val_name, var_check_lists.scope_tree, this_scope);
+	std::string list_type = get_var_type(var_check_lists.vd_list,
+		list_name, var_check_lists.scope_tree, this_scope);
+
+	if (iter_type != "") {
+		type_err_msg(iter_token, VAR_ALREADY_DECLARED, "", "");
+	}
+	if (val_type != "") {
+		type_err_msg(val_token, VAR_ALREADY_DECLARED, "", "");
+	}
+	if (list_type == "") {
+		type_err_msg(list_token, VAR_NOT_DECLARED, "", "");
+	}
+	if (list_type[list_type.size() - 1] != ']') {
+		type_err_msg(list_token,INCOMPATIBLE_TYPE,"array[]",list_type);
+	}
+
+	code_block_check(code_block, var_check_lists, this_scope,
+		BLOCK_LOOP, "");
+}
+
+void while_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	Branch cond;
+	Branch code_block;
+
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		const Branch &v = branch.branch_list[i];
+
+		if (v.type == BRACKET_ROUND) {
+			cond = v;
+		}
+		else if (v.type == CODE_BLOCK) {
+			code_block = v;
+		}
+	}
+
+	std::string cond_type = get_round_bracket_value_type(
+		cond, var_check_lists, this_scope);
+	if (cond_type != "bool") {
+		type_err_msg(cond, INCOMPATIBLE_TYPE, "bool", cond_type);
+	}
+
+	code_block_check(code_block, var_check_lists, this_scope,
+	                 BLOCK_LOOP, "");
+}
+
+void return_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	std::string nearest_return_type
+		= get_nearest_return_type(var_check_lists, this_scope);
+
+	const Branch &right_side = branch.branch_list[0];
+	std::string right_side_type
+		= get_round_bracket_value_type(right_side, var_check_lists,
+		                               this_scope);
+
+	if (nearest_return_type != right_side_type) {
+		type_err_msg(right_side, INCOMPATIBLE_TYPE,
+		             nearest_return_type, right_side_type);
+	}
+}
+
+void break_check(const Branch &branch,
+VarCheckLists &var_check_lists, int this_scope) {
+	if (this_scope == 0) {
+		type_err_msg(branch, CANT_BREAK, "", "");
+		return
+	}
+	if (!can_break(var_check_lists, this_scope)) {
+		type_err_msg(branch, CANT_BREAK, "", "");
+	}
+}
+
 void code_block_check(const Branch &code_block,
 VarCheckLists &var_check_lists, int parent_scope,
 CodeBlockType code_block_type,
 const std::string &return_type) {
 	int this_scope = (int)var_check_lists.scope_tree.size();
 	var_check_lists.scope_tree.push_back(parent_scope);
+	if (code_block_type == BLOCK_IF) {
+		code_block_return_type_list.push_back("is BLOCK_IF");
+	}
+	else if (code_block_type == BLOCK_LOOP) {
+		code_block_return_type_list.push_back("is BLOCK_LOOP");
+	}
+	else {
+		code_block_return_type_list.push_back(return_type);
+	}
 
 	for (int i = 0; i < (int)code_block.branch_list.size(); i++) {
 		const Branch &v = code_block.branch_list[i];
@@ -802,6 +1047,31 @@ const std::string &return_type) {
 		}
 		else if (v.type == LAMBDA_ASSIGN) {
 			lambda_assign_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == IF) {
+			if_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == ELSEIF) {
+			elseif_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == FOR) {
+			for_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == FOREACH) {
+			foreach_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == WHILE) {
+			while_check(v, var_check_lists, this_scope);
+		}
+
+		else if (v.type == RETURN) {
+			return_check(v, var_check_lists, this_scope);
+		}
+		else if (v.type == CONTINUE) {
+			type_err_msg(v, CONTINUE_UNSUPPORTED, "", "");
+		}
+		else if (v.type == BREAK) {
+			break_check(v, var_check_lists, this_scope);
 		}
 	}
 }
