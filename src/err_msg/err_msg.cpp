@@ -91,6 +91,9 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case CANT_HAVE_EMPTY_STRUCT:
 		s = " struct cant be empty";
 		break;
+	case MULTI_RETURN_UNSUPPORTED:
+		s = " multi-return is not supported yet";
+		break;
 
 		default:
 		s = " unhandled";

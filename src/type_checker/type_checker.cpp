@@ -1125,8 +1125,10 @@ VarCheckLists &var_check_lists, int this_scope) {
 	if (list_type[list_type.size() - 1] == ']') {
 		VarDeclare val_var_declare;
 		val_var_declare.var_name = val_name;
-		val_var_declare.var_type=list_type.substr(0,list_type.length()-2);
-		val_var_declare.scope_id = (int)var_check_lists.scope_tree.size();
+		val_var_declare.var_type
+			= list_type.substr(0,list_type.length()-2);
+		val_var_declare.scope_id
+			= (int)var_check_lists.scope_tree.size();
 		val_var_declare.branch = val_token;
 		add_var_declare(
 			var_check_lists.vd_list,

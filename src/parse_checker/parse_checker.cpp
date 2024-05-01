@@ -388,6 +388,11 @@ void funcnew_check(const Branch &token_list, int start, int end) {
 		err_msg(token_list.branch_list[bracket_close+1],
 		        EXPECT_RETURN_TYPE);
 	}
+
+	if (token_list.branch_list[bracket_close + 3].str == ",") {
+		err_msg(token_list.branch_list[bracket_close + 3],
+		        MULTI_RETURN_UNSUPPORTED);
+	}
 }
 
 void if_check(const Branch &token_list, int start, int end) {
@@ -562,6 +567,10 @@ void lambda_check(const Branch &token_list, int start, int end) {
 
 	if (!is_return_type(bl[argv_end + 3])) {
 		err_msg(bl[argv_end + 3], EXPECT_RETURN_TYPE);
+	}
+
+	if (bl[argv_end + 4].str == ",") {
+		err_msg(bl[argv_end + 4], MULTI_RETURN_UNSUPPORTED);
 	}
 
 	if (bl[end].str != "end") {

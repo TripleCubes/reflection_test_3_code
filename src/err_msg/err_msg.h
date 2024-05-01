@@ -25,6 +25,7 @@ enum ErrMsgType: int {
 	EXPECT_VAR_NAME,
 
 	CANT_HAVE_EMPTY_STRUCT,
+	MULTI_RETURN_UNSUPPORTED,
 };
 
 enum TypeErrMsgType: int {
