@@ -3,6 +3,7 @@
 #include "../tree/types.h"
 #include "../err_msg/err_msg.h"
 #include "../tree/var_types.h"
+#include "../tree/var_types.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -580,7 +581,8 @@ void typenew_lambda_check(const Branch &token_list,int start,int end) {
 	lambda_check(token_list, start + 4, end);
 }
 
-void typenew_member_check(const Branch &token_list,int start,int end) {
+void typenew_member_check_primitive(const Branch &token_list,
+int start,int end) {
 	const std::vector<Branch> &bl = token_list.branch_list;
 
 	if (sz(start, end) < 5) {
@@ -589,6 +591,25 @@ void typenew_member_check(const Branch &token_list,int start,int end) {
 
 	typenew_member_left_side_check(token_list, start, end);
 	right_side_check(token_list, start + 4, end, false);
+}
+
+void typenew_member_check_struct(const Branch &token_list,
+int start,int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 6) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	typenew_member_left_side_check(token_list, start, end);
+	
+	if (bl[start + 4].str != "{") {
+		err_msg(bl[start + 4], CANT_PARSE);
+	}
+	
+	if (bl[start + 5].str != "}") {
+		err_msg(bl[start + 5], CANT_PARSE);
+	}
 }
 
 bool is_inc_code_block_count(const Branch &token,const Branch &minus2){
@@ -608,11 +629,19 @@ void typenew_content_check(const Branch &token_list,int start,int end){
 	auto member_finished = [
 		&token_list, &member_start
 	](int member_end) -> void {
-		if (token_list.branch_list[member_start + 2].str == "fn") {
+		const std::string &type
+			= token_list.branch_list[member_start + 2].str;
+
+		if (type == "fn") {
 			typenew_lambda_check(token_list, member_start, member_end);
 		}
+		else if (is_primitive(type)) {
+			typenew_member_check_primitive(token_list,
+				member_start, member_end);
+		}
 		else {
-			typenew_member_check(token_list, member_start, member_end);
+			typenew_member_check_struct(token_list,
+				member_start, member_end);
 		}
 	};
 

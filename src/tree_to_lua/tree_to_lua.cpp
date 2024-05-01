@@ -33,6 +33,19 @@ void str_grouped_token(std::string &result, const Branch &token) {
 	}
 }
 
+void last_dot_to_colon(Branch &token) {
+	int dot_pos = 0;
+
+	for (int i = 0; i < (int)token.branch_list.size(); i++) {
+		const Branch &v = token.branch_list[i];
+		if (v.str == ".") {
+			dot_pos = i;
+		}
+	}
+
+	token.branch_list[dot_pos].str = ":";
+}
+
 void str_bracket(std::string &result, const Branch &bracket) {
 	for (int i = 0; i < get_bracket_size(bracket); i++) {
 		const Branch &v = bracket.branch_list[i];
@@ -59,6 +72,7 @@ void str_bracket(std::string &result, const Branch &bracket) {
 			if (i != 0) { result += " "; }
 			int sz = (int)v.branch_list.size();
 			Branch last = v.branch_list[sz - 1];
+			last_dot_to_colon(last);
 			
 			str_grouped_token(result, last);
 			result += "(";
@@ -145,6 +159,7 @@ void funccall_to_str(std::string &result, const Branch &branch) {
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == NAME) {
+			last_dot_to_colon(v);
 			str_grouped_token(result, v);
 			result += "(";
 		}
