@@ -29,7 +29,29 @@ void write_file(const std::string &file_path, const std::string &str) {
 	ofs.close();
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+	bool linklib = false;
+	bool build_web = false;
+	if (argc > 2) {
+		std::cout << "too much arguments" << std::endl;
+		return 0;
+	}
+	if (argc == 2) {
+		std::string arg_str(argv[1]);
+		if (arg_str == "linklib") {
+			linklib = true;
+		}
+		else if (arg_str == "web") {
+			build_web = true;
+		}
+		else {
+			std::cout << "invalid argument " << arg_str << std::endl;
+			std::cout << "arguments:  linklib  web" << std::endl;
+			return 0;
+		}
+	}
+
+
 	std::vector<std::string> cpp_file_list;
 	std::string src_path = "./src/";
 	std::string build_path = "./build/";
@@ -84,6 +106,9 @@ int main() {
 		}
 	}
 	link_rule += "\n";
+	if (linklib) {
+		link_str += " -static-libgcc -static-libstdc++";
+	}
 	link_str += "\n\n";
 	depend_str += "\n\n";
 
