@@ -1,4 +1,5 @@
-fn aaa() -> number
-	print(10)
-	return a + 
+let a: fn = fn() -> void
+end
+
+a = fn(z: number) -> void
 end

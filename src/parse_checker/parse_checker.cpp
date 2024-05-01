@@ -659,6 +659,54 @@ void return_check(const Branch &token_list, int start, int end) {
 	std::cout << start << " " << end << std::endl;
 	right_side_check(token_list, start + 1, end, false);
 }
+
+void lambda_new_check(const Branch &token_list, int start, int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+	
+	if (sz(start, end) < 11) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start + 1].type != NAME) {
+		err_msg(bl[start + 1], EXPECT_VAR_NAME);
+	}
+
+	if (bl[start + 2].str != ":") {
+		err_msg(bl[start + 2], CANT_PARSE);
+	}
+
+	if (bl[start + 3].str != "fn") {
+		err_msg(bl[start + 3], CANT_PARSE);
+	}
+
+	if (bl[start + 4].str != "=") {
+		err_msg(bl[start + 4], CANT_PARSE);
+	}
+
+	int right_side_start = start + 5;
+
+	lambda_check(token_list, right_side_start, end);
+}
+
+void lambda_assign_check(const Branch &token_list, int start, int end){
+	const std::vector<Branch> &bl = token_list.branch_list;
+	
+	if (sz(start, end) < 8) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start].type != NAME) {
+		err_msg(bl[start], EXPECT_VAR_NAME);
+	}
+
+	if (bl[start + 1].str != "=") {
+		err_msg(bl[start + 1], CANT_PARSE);
+	}
+
+	int right_side_start = start + 2;
+
+	lambda_check(token_list, right_side_start, end);
+}
 }
 
 void parse_check(const Branch &token_list, BranchType branch_type,
@@ -701,5 +749,11 @@ int start, int end) {
 	}
 	else if (branch_type == RETURN) {
 		return_check(token_list, start, end);
+	}
+	else if (branch_type == LAMBDA_NEW) {
+		lambda_new_check(token_list, start, end);
+	}
+	else if (branch_type == LAMBDA_ASSIGN) {
+		lambda_assign_check(token_list, start, end);
 	}
 }
