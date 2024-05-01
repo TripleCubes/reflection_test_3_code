@@ -1,9 +1,1 @@
-type A {
-	a: number = 10,
-	f: fn = fn() -> void
-		self.f2()
-	end,
-	f2: fn = fn() -> void
-		let z: number = self.a
-	end,
-}
+let a: number[] = [10, 20, 30]

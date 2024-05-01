@@ -58,9 +58,9 @@ void str_bracket(std::string &result, const Branch &bracket) {
 		}
 		else if (v.type == BRACKET_SQUARE) {
 			if (i != 0) { result += " "; }
-			result += "[";
+			result += "{";
 			str_bracket(result, v);
-			result += "]";
+			result += "}";
 		}
 		else if (v.type == BRACKET_CURLY) {
 			if (i != 0) { result += " "; }
