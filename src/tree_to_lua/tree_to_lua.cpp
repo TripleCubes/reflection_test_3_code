@@ -348,20 +348,21 @@ int indent) {
 
 		str_indent(result, indent + 1);
 
+		if (type == "fn") {
+			result += "a.";
+			lambda_to_str(result, member, indent + 1);
+			result += "\n";
+			continue;
+		}
+
 		Branch calc_start_branch = defl.branch_list[0].branch_list[0];
 		if (calc_start_branch.type == BRACKET_CURLY) {
 			result += "a." + param + " = ";
 			result += TYPEDEFL_BEGIN + type + "()";
 		}
 		else {
-			if (type == "fn") {
-				result += "a.";
-				lambda_to_str(result, member, indent + 1);
-			}
-			else {
-				result += "a." + param + " = ";
-				str_bracket(result, defl);
-			}
+			result += "a." + param + " = ";
+			str_bracket(result, defl);
 		}
 		result += "\n";
 	}

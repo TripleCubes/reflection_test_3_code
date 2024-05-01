@@ -110,13 +110,14 @@ std::vector<std::string> &argv_type_list,
 const std::string &func_name,
 const std::vector<VarDeclare> vd_list,
 const std::vector<FuncDeclare> fd_list,
+const std::vector<int> scope_tree,
 int this_scope) {
 	for (int i = 0; i < (int)fd_list.size(); i++) {
 		const FuncDeclare func_declare = fd_list[i];
 		int index = func_declare.var_declare_index;
 		const VarDeclare &var_declare = vd_list[index];
 		if (var_declare.var_name == func_name
-		&& var_declare.scope_id == this_scope) {
+		&& is_in_scope(scope_tree, this_scope, var_declare.scope_id)) {
 			for (int j = 0; j < (int)func_declare.argv.size(); j++) {
 				const std::string &arg_type
 					= func_declare.argv[j];
@@ -130,13 +131,14 @@ std::string get_return_type(
 const std::string &func_name,
 const std::vector<VarDeclare> vd_list,
 const std::vector<FuncDeclare> fd_list,
+const std::vector<int> scope_tree,
 int this_scope) {
 	for (int i = 0; i < (int)fd_list.size(); i++) {
 		const FuncDeclare func_declare = fd_list[i];
 		int index = func_declare.var_declare_index;
 		const VarDeclare &var_declare = vd_list[index];
 		if (var_declare.var_name == func_name
-		&& var_declare.scope_id == this_scope) {
+		&& is_in_scope(scope_tree, this_scope, var_declare.scope_id)) {
 			return func_declare.return_type;
 		}
 	}

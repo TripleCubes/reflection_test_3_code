@@ -161,11 +161,14 @@ const std::string &type1, const std::string &type2) {
 		s = " can only break inside a loop";
 		break;
 	case MUST_RETURN_END_OF_FUNC:
-		s = " must return at end of function";
+		s = " must return at end of non void function";
 		break;
 	case INCOMPATIBLE_INHERITANCE_TYPE:
 		s = " incompatible inherited type\n";
 		s += "expected '" + type1 + "' but got '" + type2 + "'";
+		break;
+	case FUNCNEW_ONLY_IN_ROOT_SCOPE:
+		s = " this function syntax is only valid in global scope";
 		break;
 	default:
 		s = " type check unhandled";

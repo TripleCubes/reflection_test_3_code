@@ -35,12 +35,14 @@ void get_argv_type_list(
 	const std::string &func_name,
 	const std::vector<VarDeclare> vd_list,
 	const std::vector<FuncDeclare> fd_list,
+	const std::vector<int> scope_tree,
 	int this_scope);
 
 std::string get_return_type(
 	const std::string &func_name,
 	const std::vector<VarDeclare> vd_list,
 	const std::vector<FuncDeclare> fd_list,
+	const std::vector<int> scope_tree,
 	int this_scope);
 
 int get_type_declare_i(

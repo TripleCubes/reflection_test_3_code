@@ -264,20 +264,24 @@ VarCheckLists &var_check_lists, int this_scope) {
 	int sz = (int)bracket.branch_list.size();
 	const Branch &func_name = bracket.branch_list[sz - 1];
 	
+	std::string return_type
+		= get_return_type(func_name.str, var_check_lists.vd_list,
+		                  var_check_lists.fd_list,
+		                  var_check_lists.scope_tree,
+		                  this_scope);
+
+	if (return_type == "") {
+		type_err_msg(func_name, FUNC_NOT_DECLARED, "", "");
+		std::cout << var_check_lists.fd_list.size() << "AAAA";
+		return "";
+	}
+
 	std::vector<std::string> argv_type_list;
 	get_argv_type_list(argv_type_list, func_name.str,
 	                   var_check_lists.vd_list,
 	                   var_check_lists.fd_list,
+	                   var_check_lists.scope_tree,
 	                   this_scope);
-
-	if (argv_type_list.size() == 0) {
-		type_err_msg(func_name, FUNC_NOT_DECLARED, "", "");
-		return "";
-	}
-
-	std::string return_type
-		= get_return_type(func_name.str, var_check_lists.vd_list,
-		                  var_check_lists.fd_list, this_scope);
 
 	if ((int)bracket.branch_list.size() - 1
 	!= (int)argv_type_list.size()) {
@@ -536,6 +540,10 @@ const std::string &return_type);
 
 void funcnew_check(const Branch &branch,
 VarCheckLists &var_check_lists, int this_scope) {
+	if (this_scope != 0) {
+		type_err_msg(branch, FUNCNEW_ONLY_IN_ROOT_SCOPE, "", "");
+	}
+
 	Branch argv_branch;
 	Branch return_type_branch;
 	Branch code_block;
@@ -617,6 +625,44 @@ VarCheckLists &var_check_lists, int this_scope) {
 	}
 }
 
+void typenew_member_check(const Branch &right_side,
+VarCheckLists &var_check_lists, int this_scope,
+const std::string &type) {
+	std::string check_type;
+	bool is_array = false;
+	const Branch &first_calc = right_side.branch_list[0]
+										 .branch_list[0];
+	if (first_calc.type == BRACKET_SQUARE) {
+		is_array = true;
+	}
+
+	if (is_array)
+	{
+		std::string array_type
+		= get_array_type(right_side, var_check_lists, this_scope);
+
+		check_type = array_type;
+	}
+	else {
+		std::string right_side_type = get_round_bracket_value_type(
+			right_side, var_check_lists, this_scope);
+		check_type = right_side_type;
+	}
+
+	if (!type_compatible(var_check_lists.td_list,type,check_type)){
+		if (is_primitive(type) || is_array) {
+			type_err_msg(right_side,INCOMPATIBLE_TYPE,
+						 type,check_type);
+		}
+		else {
+			if (check_type != "{}") {
+				type_err_msg(right_side,INCOMPATIBLE_TYPE,
+							 type,check_type);
+			}
+		}
+	}
+}
+
 void typenew_check(const Branch &branch,
 VarCheckLists &var_check_lists, int this_scope) {
 	std::string name;
@@ -657,46 +703,35 @@ VarCheckLists &var_check_lists, int this_scope) {
 		str_grouped_token(type, v.branch_list[1]);
 
 		const Branch right_side = v.branch_list[3];
-		std::string check_type;
 
-		bool is_array = false;
-		const Branch &first_calc = right_side.branch_list[0]
-											 .branch_list[0];
-		if (first_calc.type == BRACKET_SQUARE) {
-			is_array = true;
-		}
+		if (type != "fn") {
+			typenew_member_check(right_side, var_check_lists,
+			                     this_scope, type);
 
-		if (is_array)
-		{
-			std::string array_type
-			= get_array_type(right_side, var_check_lists, this_scope);
-
-			check_type = array_type;
+			VarDeclare var_declare;
+			str_grouped_token(var_declare.var_name, v.branch_list[0]);
+			var_declare.var_type = type;
+			var_declare.branch = v.branch_list[1];
+			type_declare.member_list.push_back(var_declare);
 		}
 		else {
-			std::string right_side_type = get_round_bracket_value_type(
-				right_side, var_check_lists, this_scope);
-			check_type = right_side_type;
-		}
+			std::string check_type = right_side.branch_list[4].str;
+			
+			std::string return_type;
+			const Branch &return_type_branch
+			             = right_side.branch_list[3].branch_list[0];
+			str_grouped_token(return_type, return_type_branch);
+			
+			const Branch &code_block = right_side.branch_list[4];
+			code_block_check(code_block, var_check_lists, this_scope,
+			                 BLOCK_FUNC, return_type);
 
-		if (!type_compatible(var_check_lists.td_list,type,check_type)){
-			if (is_primitive(type) || is_array) {
-				type_err_msg(right_side,INCOMPATIBLE_TYPE,
-							 type,check_type);
-			}
-			else {
-				if (check_type != "{}") {
-					type_err_msg(right_side,INCOMPATIBLE_TYPE,
-								 type,check_type);
-				}
-			}
+			VarDeclare var_declare;
+			str_grouped_token(var_declare.var_name, v.branch_list[0]);
+			var_declare.var_type = check_type;
+			var_declare.branch = v.branch_list[1];
+			type_declare.member_list.push_back(var_declare);
 		}
-	
-		VarDeclare var_declare;
-		str_grouped_token(var_declare.var_name, v.branch_list[0]);
-		var_declare.var_type = type;
-		var_declare.branch = v.branch_list[1];
-		type_declare.member_list.push_back(var_declare);
 	}
 
 	var_check_lists.td_list.push_back(type_declare);

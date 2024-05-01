@@ -73,7 +73,7 @@ bool is_next_to_op(const Branch &nx, const Branch &nx_nx) {
 }
 
 bool is_next_to_open_bracket(const Branch &nx) {
-	if (is_value(nx) || is_reverse_op(nx)) {
+	if (is_value(nx) || is_reverse_op(nx) || nx.str == ")") {
 		return true;
 	}
 	return false;

@@ -1,5 +1,7 @@
-let a: fn = fn() -> void
-end
+type A {
+	a: number = 10,
+	b: fn = fn() -> void
+		print()
+	end
+}
 
-a = fn(z: number) -> void
-end
