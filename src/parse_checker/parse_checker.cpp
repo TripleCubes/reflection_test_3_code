@@ -591,7 +591,18 @@ void typenew_member_check(const Branch &token_list,int start,int end) {
 	right_side_check(token_list, start + 4, end, false);
 }
 
+bool is_inc_code_block_count(const Branch &token,const Branch &minus2){
+	if (token.str == "if" || token.str == "for"
+	|| token.str == "while"
+	|| (token.str == "fn" && minus2.str != "fn")) {
+		return true;
+	}
+	return false;
+}
+
 void typenew_content_check(const Branch &token_list,int start,int end){
+	int code_block_count = 0;
+
 	int member_start = start;
 
 	auto member_finished = [
@@ -607,7 +618,31 @@ void typenew_content_check(const Branch &token_list,int start,int end){
 
 	for (int i = start; i <= end; i++) {
 		const Branch &v = token_list.branch_list[i];
-		if (v.str == ",") {
+		Branch nx_nx;
+		if (i + 2 <= end) {
+			nx_nx = token_list.branch_list[i + 2];
+		}
+		Branch prev_2;
+		if (i - 2 >= start) {
+			prev_2 = token_list.branch_list[i - 2];
+		}
+
+		if (is_inc_code_block_count(v, prev_2)) {
+			code_block_count++;
+		}
+		if (v.str == "end") {
+			code_block_count--;
+		}
+
+		if (code_block_count < 0) {
+			err_msg(v, CANT_PARSE);
+		}
+
+		if (code_block_count != 0) {
+			continue;
+		}
+
+		if (v.str == "," && nx_nx.str == ":") {
 			member_finished(i - 1);
 			member_start = i + 1;
 		}

@@ -287,6 +287,8 @@ int indent) {
 
 void lambda_to_str(std::string &result, const Branch &branch,
 int indent);
+void lambda_to_str_typenew(std::string &result, const Branch &branch,
+int indent);
 
 void type_to_str(std::string &result, const Branch &branch,
 int indent) {
@@ -349,8 +351,7 @@ int indent) {
 		str_indent(result, indent + 1);
 
 		if (type == "fn") {
-			result += "a.";
-			lambda_to_str(result, member, indent + 1);
+			lambda_to_str_typenew(result, member, indent + 1);
 			result += "\n";
 			continue;
 		}
@@ -378,6 +379,35 @@ void return_to_str(std::string &result, const Branch &branch) {
 		if (v.type == BRACKET_ROUND) {
 			result += "return ";
 			str_bracket(result, v);
+		}
+	}
+}
+
+void lambda_to_str_typenew(std::string &result, const Branch &branch,
+int indent) {
+	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
+		Branch v = branch.branch_list[i];
+		if (v.type == NAME) {
+			result += "function a:";
+			str_grouped_token(result, v);
+			result += "(";
+		}
+		else if (v.type == LAMBDA_RIGHT_SIDE) {
+			const Branch &argv = v.branch_list[2];
+			for (int i = 0; i < (int)argv.branch_list.size(); i++) {
+				const Branch &name=argv.branch_list[i].branch_list[0];
+				str_grouped_token(result, name);
+				if (i != (int)argv.branch_list.size() - 1) {
+					result += ", ";
+				}
+			}
+			result += ")\n";
+
+			const Branch &code_block = v.branch_list[4];
+			code_block_to_str(result, code_block, indent + 1);
+
+			str_indent(result, indent);
+			result += "end\n";
 		}
 	}
 }

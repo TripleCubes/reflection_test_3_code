@@ -1,7 +1,14 @@
+fn test(n: number, s: string) -> void
+end
+
 type A {
 	a: number = 10,
-	b: fn = fn() -> void
-		print()
+	b: fn = fn(a: number, x: string) -> number
+		return 10
 	end
 }
+
+let a: A = {}
+a.b(10, "hello")
+test(10, "hello")
 

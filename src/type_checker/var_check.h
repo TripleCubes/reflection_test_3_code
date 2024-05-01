@@ -56,6 +56,7 @@ bool type_compatible(const std::vector<TypeDeclare> &td_list,
 void add_var_declare(
 	std::vector<VarDeclare> &var_declare_list,
 	const std::vector<TypeDeclare> &type_declare_list,
+	std::vector<FuncDeclare> &func_declare_list,
 	VarDeclare declare);
 
 void print_declare_lists(

@@ -18,7 +18,7 @@ int scope_id, int in_scope_id) {
 	return false;
 }
 
-std::string replace_arr_index(const std::string &var_name) {
+std::string reformat_name(const std::string &var_name) {
 	std::string result;
 
 	bool in_bracket = false;
@@ -87,6 +87,62 @@ const std::vector<TypeDeclare> &td_list, int index) {
 
 	type_err_msg(type_declare.inherit_branch, TYPE_NOT_DECLARED,"","");
 }
+
+void str_argv_from_func_type(std::vector<std::string> &result,
+const std::string func_type) {
+	int argv_start = 0;
+	int argv_end = 0;
+	
+	for (int i = 0; i < (int)func_type.length(); i++) {
+		char c = func_type[i];
+		if (c == '(') {
+			argv_start = i + 1;
+		}
+		else if (c == ')') {
+			argv_end = i - 1;
+		}
+	}
+
+	if (argv_end < argv_start) {
+		return;
+	}
+
+	std::string word;
+	for (int i = argv_start; i <= argv_end; i++) {
+		char c = func_type[i];
+		if (c == ',') {
+			result.push_back(word);
+			word = "";
+		}
+		else {
+			word += c;
+		}
+	}
+
+	if (word.length() != 0) {
+		result.push_back(word);
+	}
+}
+
+void str_return_type_from_func_type(std::string &result,
+const std::string func_type){
+	int return_type_start = 0;
+
+	for (int i = 0; i < (int)func_type.length(); i++) {
+		char v = func_type[i];
+		char nx = ' ';
+		if (i + 1 < (int)func_type.length()) {
+			nx = func_type[i + 1];
+		}
+
+		if (v == '-' && nx == '>') {
+			return_type_start = i + 3;
+		}
+	}
+
+	result = func_type.substr(return_type_start,
+		(int)func_type.length() - return_type_start);
+}
 }
 
 std::string get_var_type(
@@ -98,7 +154,7 @@ const std::vector<int> &scope_tree, int scope_id) {
 
 		bool cond = is_in_scope(scope_tree, scope_id, v.scope_id);
 
-		if (v.var_name == replace_arr_index(var_name) && cond) {
+		if (v.var_name == reformat_name(var_name) && cond) {
 			return var_declare_list[i].var_type;
 		}
 	}
@@ -182,6 +238,7 @@ const std::string &type2) {
 void add_var_declare(
 std::vector<VarDeclare> &var_declare_list,
 const std::vector<TypeDeclare> &type_declare_list,
+std::vector<FuncDeclare> &func_declare_list,
 VarDeclare declare) {
 	var_declare_list.push_back(declare);
 
@@ -194,7 +251,31 @@ VarDeclare declare) {
 		new_var_declare.scope_id = declare.scope_id;
 		add_var_declare(var_declare_list,
 		                type_declare_list,
+		                func_declare_list,
 		                new_var_declare);
+	}
+
+	if (declare.var_type[0] == 'f' && declare.var_type[1] == 'n') {
+		FuncDeclare new_func_declare;
+		new_func_declare.var_declare_index
+		                 = (int)var_declare_list.size() - 1;
+		str_argv_from_func_type(new_func_declare.argv,
+		                        declare.var_type);
+
+
+		VarDeclare new_var_declare;
+		new_var_declare.var_name = declare.var_name + "()";
+		str_return_type_from_func_type(new_var_declare.var_type,
+		                               declare.var_type);
+		new_var_declare.scope_id = declare.scope_id;
+//		add_var_declare(var_declare_list,
+//		                type_declare_list,
+//		                func_declare_list,
+//		                new_var_declare);
+
+
+		new_func_declare.return_type = new_var_declare.var_type;
+		func_declare_list.push_back(new_func_declare);
 	}
 
 
@@ -216,6 +297,7 @@ VarDeclare declare) {
 		new_var_declare.scope_id = declare.scope_id;
 		add_var_declare(var_declare_list,
 		                type_declare_list,
+		                func_declare_list,
 		                new_var_declare);
 	}
 }
@@ -254,6 +336,7 @@ const std::vector<FuncDeclare> &func_declare_list) {
 		for (int j = 0; j < (int)v.argv.size(); j++) {
 			std::cout << v.argv[j] << " ";
 		}
+		std::cout << std::endl;
 	}
 
 	std::cout << std::endl << std::endl;
