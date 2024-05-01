@@ -1156,7 +1156,7 @@ int start_pos, int end_pos) {
 			}
 			else if (prev_token.str == "return"
 			&& (token.type == NAME || token.type == KEYWORD)
-			&& nx_token.str != "(") {
+			&& nx_token.str != "(" && nx_token.type != OPERATOR) {
 				command_finished(i);
 			}
 		}

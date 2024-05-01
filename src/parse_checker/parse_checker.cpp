@@ -453,6 +453,7 @@ void for_check(const Branch &token_list, int start, int end) {
 
 	right_side_check(token_list,right_side_start,right_side_end,true);
 }
+
 void foreach_check(const Branch &token_list, int start, int end) {
 	const std::vector<Branch> &bl = token_list.branch_list;
 
@@ -479,6 +480,184 @@ void foreach_check(const Branch &token_list, int start, int end) {
 	if (bl[start + 6].str != "do") {
 		err_msg(bl[start + 6], CANT_PARSE);
 	}
+}
+
+void while_check(const Branch &token_list, int start, int end) {
+	if (sz(start, end) < 4) {
+		err_msg(token_list.branch_list[start], CANT_PARSE);
+	}
+
+	int then_pos = 0;
+	for (int i = start + 1; i <= end; i++) {
+		if (i == end) {
+			err_msg(token_list.branch_list[start], CANT_PARSE);
+		}
+
+		const Branch &v = token_list.branch_list[i];
+		if (v.str == "do") {
+			then_pos = i;
+			break;
+		}
+	}
+
+	right_side_check(token_list, start + 1, then_pos - 1, false);
+}
+
+void typenew_member_left_side_check(const Branch &token_list,
+int start, int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (bl[start].type != NAME) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start + 1].str != ":") {
+		err_msg(bl[start + 1], CANT_PARSE);
+	}
+
+	if (!is_var_type(bl[start + 2])) {
+		err_msg(bl[start + 2], CANT_PARSE);
+	}
+
+	if (bl[start + 3].str != "=") {
+		err_msg(bl[start + 3], CANT_PARSE);
+	}
+}
+
+void lambda_check(const Branch &token_list, int start, int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 6) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start].str != "fn") {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	if (bl[start + 1].str != "(") {
+		err_msg(bl[start + 1], CANT_PARSE);
+	}
+
+	int argv_start = start + 2;
+	int argv_end = 0;
+	for (int i = argv_start; i <= end; i++) {
+		if (i == end) {
+			err_msg(bl[argv_start], CANT_PARSE);
+		}
+
+		const Branch &v = bl[i];
+		if (v.str == ")") {
+			argv_end = i - 1;
+			break;
+		}
+	}
+
+	argument_list_check(token_list, argv_start, argv_end);
+
+	if (bl[argv_end + 2].str != "->") {
+		err_msg(bl[argv_end + 2], CANT_PARSE);
+	}
+
+	if (!is_return_type(bl[argv_end + 3])) {
+		err_msg(bl[argv_end + 3], EXPECT_RETURN_TYPE);
+	}
+
+	if (bl[end].str != "end") {
+		err_msg(bl[end], CANT_PARSE);
+	}
+}
+
+void typenew_lambda_check(const Branch &token_list,int start,int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 10) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	typenew_member_left_side_check(token_list, start, end);
+	
+	lambda_check(token_list, start + 4, end);
+}
+
+void typenew_member_check(const Branch &token_list,int start,int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 5) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+
+	typenew_member_left_side_check(token_list, start, end);
+	right_side_check(token_list, start + 4, end, false);
+}
+
+void typenew_content_check(const Branch &token_list,int start,int end){
+	int member_start = start;
+
+	auto member_finished = [
+		&token_list, &member_start
+	](int member_end) -> void {
+		if (token_list.branch_list[member_start + 2].str == "fn") {
+			typenew_lambda_check(token_list, member_start, member_end);
+		}
+		else {
+			typenew_member_check(token_list, member_start, member_end);
+		}
+	};
+
+	for (int i = start; i <= end; i++) {
+		const Branch &v = token_list.branch_list[i];
+		if (v.str == ",") {
+			member_finished(i - 1);
+			member_start = i + 1;
+		}
+	}
+
+	const Branch &last = token_list.branch_list[end];
+	if (last.str != ",") {
+		member_finished(end);
+	}
+}
+
+void typenew_check(const Branch &token_list, int start, int end) {
+	const std::vector<Branch> &bl = token_list.branch_list;
+
+	if (sz(start, end) < 9) {
+		err_msg(bl[start], CANT_PARSE);
+	}
+	
+	if (bl[start + 1].type != NAME) {
+		err_msg(bl[start + 1], CANT_PARSE);
+	}
+
+	int content_start = start + 3;
+	int content_end = end - 1;
+	if (bl[start + 2].str == "from") {
+		content_start = start + 5;
+
+		if (bl[start + 3].type != NAME) {
+			err_msg(bl[start + 3], CANT_PARSE);
+		}
+	}
+
+	if (bl[content_start - 1].str != "{") {
+		err_msg(bl[content_start - 1], CANT_PARSE);
+	}
+
+	if (content_end < content_start) {
+		err_msg(bl[content_start], CANT_HAVE_EMPTY_STRUCT);
+	}
+	
+	typenew_content_check(token_list, content_start, content_end);
+}
+
+void return_check(const Branch &token_list, int start, int end) {
+	if (start == end) {
+		return;
+	}
+
+	std::cout << start << " " << end << std::endl;
+	right_side_check(token_list, start + 1, end, false);
 }
 }
 
@@ -513,5 +692,14 @@ int start, int end) {
 		else {
 			foreach_check(token_list, start, end);
 		}
+	}
+	else if (branch_type == WHILE) {
+		while_check(token_list, start, end);
+	}
+	else if (branch_type == TYPE) {
+		typenew_check(token_list, start, end);
+	}
+	else if (branch_type == RETURN) {
+		return_check(token_list, start, end);
 	}
 }

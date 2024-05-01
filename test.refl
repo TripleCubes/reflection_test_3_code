@@ -1,5 +1,4 @@
-let x: bool = false
-let a: number = 10 + 5 * -(x)
-
-for i, v in list do
+fn aaa() -> number
+	print(10)
+	return a + 
 end

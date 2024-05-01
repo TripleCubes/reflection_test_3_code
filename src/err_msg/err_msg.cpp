@@ -88,6 +88,9 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case EXPECT_VAR_NAME:
 		s = " var name expected";
 		break;
+	case CANT_HAVE_EMPTY_STRUCT:
+		s = " struct cant be empty";
+		break;
 
 		default:
 		s = " unhandled";

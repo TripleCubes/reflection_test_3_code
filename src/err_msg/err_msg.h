@@ -23,6 +23,8 @@ enum ErrMsgType: int {
 	EXPECT_COMMA,
 	EXPECT_ARROW,
 	EXPECT_VAR_NAME,
+
+	CANT_HAVE_EMPTY_STRUCT,
 };
 
 enum TypeErrMsgType: int {

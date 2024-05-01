@@ -1109,10 +1109,18 @@ VarCheckLists &var_check_lists, int this_scope) {
 	std::string nearest_return_type
 		= get_nearest_return_type(var_check_lists, this_scope);
 
-	const Branch &right_side = branch.branch_list[0];
-	std::string right_side_type
-		= get_round_bracket_value_type(right_side, var_check_lists,
-		                               this_scope);
+	std::string right_side_type;
+	Branch right_side;
+	if (branch.branch_list.size() == 0) {
+		right_side_type = "void";
+		right_side = branch;
+	}
+	else {
+		right_side = branch.branch_list[0];
+		right_side_type
+			= get_round_bracket_value_type(right_side, var_check_lists,
+										   this_scope);
+	}
 
 	if (nearest_return_type != right_side_type) {
 		type_err_msg(right_side, INCOMPATIBLE_TYPE,
