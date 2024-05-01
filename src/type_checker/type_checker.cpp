@@ -1039,6 +1039,17 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	VarDeclare var_declare;
+	str_grouped_token(var_declare.var_name, iter_name_token);
+	var_declare.var_type = "number";
+	var_declare.scope_id = (int)var_check_lists.scope_tree.size();
+	var_declare.branch = iter_name_token;
+	add_var_declare(
+		var_check_lists.vd_list,
+		var_check_lists.td_list,
+		var_check_lists.fd_list,
+		var_declare);
+
 	std::string iter_name;
 	str_grouped_token(iter_name, iter_name_token);
 	std::string iter_type = get_var_type(var_check_lists.vd_list,
@@ -1099,6 +1110,30 @@ VarCheckLists &var_check_lists, int this_scope) {
 		val_name, var_check_lists.scope_tree, this_scope);
 	std::string list_type = get_var_type(var_check_lists.vd_list,
 		list_name, var_check_lists.scope_tree, this_scope);
+
+	VarDeclare iter_var_declare;
+	iter_var_declare.var_name = iter_name;
+	iter_var_declare.var_type = "number";
+	iter_var_declare.scope_id = (int)var_check_lists.scope_tree.size();
+	iter_var_declare.branch = iter_token;
+	add_var_declare(
+		var_check_lists.vd_list,
+		var_check_lists.td_list,
+		var_check_lists.fd_list,
+		iter_var_declare);
+
+	if (list_type[list_type.size() - 1] == ']') {
+		VarDeclare val_var_declare;
+		val_var_declare.var_name = val_name;
+		val_var_declare.var_type=list_type.substr(0,list_type.length()-2);
+		val_var_declare.scope_id = (int)var_check_lists.scope_tree.size();
+		val_var_declare.branch = val_token;
+		add_var_declare(
+			var_check_lists.vd_list,
+			var_check_lists.td_list,
+			var_check_lists.fd_list,
+			val_var_declare);
+	}
 
 	if (iter_type != "") {
 		type_err_msg(iter_token, VAR_ALREADY_DECLARED, "", "");

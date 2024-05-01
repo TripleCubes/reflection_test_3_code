@@ -1,15 +1,5 @@
-type A {
-	f: fn = fn(a: number, x: string) -> number
-		return 10
-	end
-}
+let a: string[] = [1, 3, 4, 5,2 ,4]
 
-type B {
-	a: A = {},
-}
-
-let x: B = {}
-
-x.a.f(10, "hello")
-let m: number = x.a.f(10, "hello")
-
+for i, v in a do
+	let c: number = v
+end
