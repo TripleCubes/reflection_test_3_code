@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include "file/file.h"
 #include "tree/types.h"
 #include "tree/token_list.h"
 #include "tree/grouped_token_list.h"
@@ -9,12 +8,8 @@
 #include "type_checker/type_checker.h"
 #include "err_msg/err_msg.h"
 
-bool reflection_test_3(const std::string &path,
+bool reflection_test_3(const std::string &code_str,
 std::string &result_code, std::string &error_str) {
-	std::string code_str = file_to_str(path);
-	if (code_str == "") {
-		return false;
-	}
 //	std::cout << code_str << std::endl;
 	err_msg_set_code_str(code_str);
 

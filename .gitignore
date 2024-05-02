@@ -1,4 +1,5 @@
 makefile
-mkfgen.*
+makefilegen.*
+*.lua
 
 !makefilegen.cpp

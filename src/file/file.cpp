@@ -13,3 +13,10 @@ std::string file_to_str(const std::string &path) {
 	ss << i.rdbuf();
 	return ss.str();
 }
+
+void write_to_file(const std::string &path, const std::string &str) {
+	std::ofstream o;
+	o.open(path);
+	o << str;
+	o.close();
+}

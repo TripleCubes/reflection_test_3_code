@@ -1,6 +1,7 @@
 #include "reflection_test_3.h"
 #include <string>
 #include <iostream>
+#include "file/file.h"
 
 int main(int argc, char *argv[]) {
 	if (argc > 3) {
@@ -21,15 +22,29 @@ int main(int argc, char *argv[]) {
 	std::string input_path(argv[1]);
 
 
+	std::string code_str = file_to_str(input_path);
+	if (code_str == "") {
+		std::cout << "input file is empty or not found" << std::endl;
+		return 0;
+	}
+
+
 	std::string result_code;
 	std::string error_str;
 	bool success = reflection_test_3(
-		input_path,
+		code_str,
 		result_code,
 		error_str);
 
+
 	if (success) {
-		std::cout << result_code << std::endl;
+		if (output_path != "") {
+			std::cout << "written to " << output_path << std::endl;
+			write_to_file(output_path, result_code);
+		}
+		else {
+			std::cout << result_code << std::endl;
+		}
 	}
 	else {
 		std::cout << error_str << std::endl;
