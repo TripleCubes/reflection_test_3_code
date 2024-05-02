@@ -972,9 +972,13 @@ int start_pos, int end_pos) {
 	int command_start_pos = 0;
 
 	auto command_finished = [&grouped_token_list, &command_type,
-	&command_start_pos, &result](int command_end_pos) -> void {
-		parse_check(grouped_token_list, command_type,
+	&command_start_pos, &result](int command_end_pos) -> bool {
+		bool check_result
+		= parse_check(grouped_token_list, command_type,
 			command_start_pos, command_end_pos);
+		if (check_result == false) {
+			return false;
+		}
 
 		Branch start_token = grouped_token_list
 		                     .branch_list[command_start_pos];
@@ -1027,10 +1031,13 @@ int start_pos, int end_pos) {
 
 		result.branch_list.push_back(new_branch);
 		command_type = NONE;
+
+		return true;
 	};
 
 	int code_block_count = 0;
 	int curly_count = 0;
+	bool error_found = false;
 	
 	for (int i = start_pos; i <= end_pos; i++) {
 		Branch token = grouped_token_list.branch_list[i];
@@ -1128,77 +1135,81 @@ int start_pos, int end_pos) {
 		}
 		if (command_type == VARNEW) {
 			if (right_side_end(token, nx_token)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == ASSIGN) {
 			if (right_side_end(token, nx_token)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == FUNCCALL) {
 			if (funccall_end(token, nx_token)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == FUNCNEW) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == IF) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == ELSEIF) {
 			if (token.str == "then") {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == ELSE) {
-			command_finished(i);
+			error_found = command_finished(i);
 		}
 		if (command_type == FOR) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == WHILE) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == TYPE) {
 			if (curly_bracket_block_end(token, curly_count)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == RETURN) {
 			if (right_side_end(token, nx_token)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 			else if (prev_token.str == "return"
 			&& (token.type == NAME || token.type == KEYWORD)
 			&& nx_token.str != "(" && nx_token.type != OPERATOR) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == BREAK) {
-			command_finished(i);
+			error_found = command_finished(i);
 		}
 		if (command_type == CONTINUE) {
-			command_finished(i);
+			error_found = command_finished(i);
 		}
 		if (command_type == LAMBDA_NEW) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
 		}
 		if (command_type == LAMBDA_ASSIGN) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				command_finished(i);
+				error_found = command_finished(i);
 			}
+		}
+
+		if (error_found) {
+			return;
 		}
 	}
 

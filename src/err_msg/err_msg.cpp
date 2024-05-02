@@ -7,6 +7,7 @@
 namespace {
 std::string code_str;
 std::string type_err_msg_str;
+std::string err_msg_str;
 
 std::string err_line(int line) {
 	std::string result;
@@ -118,11 +119,9 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	s3 += "| ";
 	s3 += arrow(branch.column) + "\n";
 
-	combined += s2 + s3 + "\n";
+	combined += s2 + s3;
 
-	std::cout << combined << std::endl;
-
-	exit(0);
+	err_msg_str += combined;
 }
 
 void type_err_msg(const Branch &branch, TypeErrMsgType type,
@@ -200,6 +199,10 @@ const std::string &type1, const std::string &type2) {
 
 void err_msg_set_code_str(const std::string &in_code_str) {
 	code_str = in_code_str;
+}
+
+std::string get_err_msg_str() {
+	return err_msg_str;
 }
 
 std::string get_type_err_msg_str() {

@@ -4,7 +4,7 @@
 struct Branch;
 enum BranchType: int;
 
-void parse_check(const Branch &token_list, BranchType branch_type,
+bool parse_check(const Branch &token_list, BranchType branch_type,
 int start, int end);
 
 #endif
