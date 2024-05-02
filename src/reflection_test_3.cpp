@@ -21,7 +21,7 @@ std::string &result_code, std::string &error_str) {
 
 	Branch token_list;
 	to_token_list(token_list, code_str);
-//	print_branch(token_list, 0);
+	print_branch(token_list, 0);
 
 
 	Branch grouped_token_list;

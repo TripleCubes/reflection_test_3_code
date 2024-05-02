@@ -89,10 +89,34 @@ void to_token_list(Branch &result, const std::string &code_str) {
 	};
 
 	char quote_char = ' ';
+	bool in_comment = false;
 
 	for (int i = 0; i < (int)code_str.length(); i++) {
 		char c = code_str[i];
+		char nx = ' ';
+		if (i + 1 < (int)code_str.length()) {
+			nx = code_str[i + 1];
+		}
 		CharType char_type = get_char_type(c);
+
+		if (c == '-' && nx == '-') {
+			if (token_type != NONE) {
+				token_finish();
+			}
+			in_comment = true;
+		}
+
+		if (in_comment) {
+			if (c == '\n') {
+				line++;
+				column = 1;
+				token_type = NONE;
+
+				in_comment = false;
+			}
+
+			continue;
+		}
 
 		if (token_type == NAME) {
 			if (char_type == CHAR_TXT || char_type == CHAR_NUM) {
