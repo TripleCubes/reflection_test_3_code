@@ -4,6 +4,7 @@
 #include "../err_msg/err_msg.h"
 #include "var_check.h"
 #include "../tree/var_types.h"
+#include "../lib_func/lib_func.h"
 #include <vector>
 #include <string>
 
@@ -266,6 +267,12 @@ VarCheckLists &var_check_lists, int this_scope) {
 	
 	std::string func_name_str;
 	str_grouped_token(func_name_str, func_name);
+
+	std::string lib_func_return_type
+		= get_lib_func_return_type(func_name_str);
+	if (lib_func_return_type != "") {
+		return lib_func_return_type;
+	}
 
 	std::string return_type
 		= get_return_type(func_name_str, var_check_lists.vd_list,

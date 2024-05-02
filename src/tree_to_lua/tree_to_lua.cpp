@@ -2,11 +2,12 @@
 
 #include "../tree/types.h"
 #include "../tree/calc_tree/shared.h"
+#include "../lib_func/lib_func.h"
 #include <vector>
 #include <iostream>
 
 namespace {
-const std::string TYPEDEFL_BEGIN = "default_";
+const std::string TYPEDEFL_BEGIN = "__default_";
 
 void code_block_to_str(std::string &result,
 const Branch &code_block, int indent);
@@ -34,6 +35,13 @@ void str_grouped_token(std::string &result, const Branch &token) {
 }
 
 void last_dot_to_colon(Branch &token) {
+	std::string name;
+	str_grouped_token(name, token);
+	std::string lib_func_return_type = get_lib_func_return_type(name);
+	if (lib_func_return_type != "") {
+		return;
+	}
+
 	int dot_pos = 0;
 
 	for (int i = 0; i < (int)token.branch_list.size(); i++) {
@@ -41,6 +49,10 @@ void last_dot_to_colon(Branch &token) {
 		if (v.str == ".") {
 			dot_pos = i;
 		}
+	}
+
+	if (dot_pos == 0) {
+		return;
 	}
 
 	token.branch_list[dot_pos].str = ":";
