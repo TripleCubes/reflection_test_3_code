@@ -1,8 +1,14 @@
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 std::string file_to_str(const std::string &path) {
 	std::ifstream i(path);
+	if (!i.good()) {
+		std::cout << path << " not found" << std::endl;
+		return "";
+	}
+
 	std::stringstream ss;
 	ss << i.rdbuf();
 	return ss.str();
