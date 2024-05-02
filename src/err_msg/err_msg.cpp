@@ -51,6 +51,12 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case EXPECT_VALUE:
 		s = " value expected";
 		break;
+	case EXPECT_OPEN_ROUND_BRACKET:
+		s = " '(' expected";
+		break;
+	case EXPECT_OPEN_CURLY_BRACKET:
+		s = " '{' expected";
+		break;
 	case EXPECT_CLOSE_ROUND_BRACKET:
 		s = " ')' expected";
 		break;
@@ -89,8 +95,34 @@ void err_msg(const Branch &branch, ErrMsgType type) {
 	case EXPECT_VAR_NAME:
 		s = " var name expected";
 		break;
+	case EXPECT_FUNC_NAME:
+		s = " function name expected";
+		break;
+	case EXPECT_TYPE_NAME:
+		s = " type name expected";
+		break;
+	case EXPECT_EQUAL_SIGN:
+		s = " '=' expected";
+		break;
+
+	case EXPECT_THEN:
+		s = " 'then' expected";
+		break;
+	case EXPECT_DO:
+		s = " 'do' expected";
+		break;
+	case EXPECT_IN_KEYWORD:
+		s = " 'in' expected";
+		break;
+	case EXPECT_FN_KEYWORD:
+		s = " 'fn' expected";
+		break;
+	case EXPECT_END:
+		s = " 'end' expected";
+		break;
+
 	case CANT_HAVE_EMPTY_STRUCT:
-		s = " struct cant be empty";
+		s = " type cant be empty";
 		break;
 	case MULTI_RETURN_UNSUPPORTED:
 		s = " multi-return is not supported yet";

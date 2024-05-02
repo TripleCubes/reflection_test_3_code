@@ -6,6 +6,7 @@
 #include "../parse_checker/parse_checker.h"
 #include <string>
 
+
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {
 	if (token.str == ")"
@@ -1037,7 +1038,7 @@ int start_pos, int end_pos) {
 
 	int code_block_count = 0;
 	int curly_count = 0;
-	bool error_found = false;
+	bool continue_loop = true;
 	
 	for (int i = start_pos; i <= end_pos; i++) {
 		Branch token = grouped_token_list.branch_list[i];
@@ -1135,80 +1136,80 @@ int start_pos, int end_pos) {
 		}
 		if (command_type == VARNEW) {
 			if (right_side_end(token, nx_token)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == ASSIGN) {
 			if (right_side_end(token, nx_token)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == FUNCCALL) {
 			if (funccall_end(token, nx_token)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == FUNCNEW) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == IF) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == ELSEIF) {
 			if (token.str == "then") {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == ELSE) {
-			error_found = command_finished(i);
+			continue_loop = command_finished(i);
 		}
 		if (command_type == FOR) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == WHILE) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == TYPE) {
 			if (curly_bracket_block_end(token, curly_count)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == RETURN) {
 			if (right_side_end(token, nx_token)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 			else if (prev_token.str == "return"
 			&& (token.type == NAME || token.type == KEYWORD)
 			&& nx_token.str != "(" && nx_token.type != OPERATOR) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == BREAK) {
-			error_found = command_finished(i);
+			continue_loop = command_finished(i);
 		}
 		if (command_type == CONTINUE) {
-			error_found = command_finished(i);
+			continue_loop = command_finished(i);
 		}
 		if (command_type == LAMBDA_NEW) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 		if (command_type == LAMBDA_ASSIGN) {
 			if (code_block_end(token, code_block_count, prev_2)) {
-				error_found = command_finished(i);
+				continue_loop = command_finished(i);
 			}
 		}
 
-		if (error_found) {
+		if (!continue_loop) {
 			return;
 		}
 	}

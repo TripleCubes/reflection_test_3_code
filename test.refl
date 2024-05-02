@@ -1,1 +1,5 @@
-let a: number = 3 + b
+for i = 10, 20 do
+	print(10)
+end
+
+let a = 20
