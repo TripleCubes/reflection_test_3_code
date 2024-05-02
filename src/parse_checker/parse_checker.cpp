@@ -512,9 +512,11 @@ bool elseif_check(const Branch &token_list, int start, int end) {
 		return false;
 	}
 
+	int then_pos = 0;
 	for (int i = start + 1; i <= end; i++) {
 		const Branch &v = token_list.branch_list[i];
 		if (v.str == "then") {
+			then_pos = i;
 			break;
 		}
 
@@ -522,6 +524,12 @@ bool elseif_check(const Branch &token_list, int start, int end) {
 			err_msg(token_list.branch_list[start], EXPECT_THEN);
 			return false;
 		}
+	}
+
+	bool check_result
+		= right_side_check(token_list, start + 1, then_pos - 1, false);
+	if (check_result == false) {
+		return false;
 	}
 
 	return true;
