@@ -4,8 +4,10 @@
 #include "var_types.h"
 #include "calc_tree.h"
 #include "../parse_checker/parse_checker.h"
+#include "../err_msg/err_msg.h"
 #include <string>
 
+#include <iostream>
 
 namespace {
 bool funccall_end(const Branch &token, const Branch &nx_token) {
@@ -1134,6 +1136,12 @@ int start_pos, int end_pos) {
 				command_type = CONTINUE;
 			}
 		}
+
+		if (command_type == NONE) {
+			err_msg(token, CANT_PARSE);
+			return;
+		}
+
 		if (command_type == VARNEW) {
 			if (right_side_end(token, nx_token)) {
 				continue_loop = command_finished(i);
@@ -1208,7 +1216,7 @@ int start_pos, int end_pos) {
 				continue_loop = command_finished(i);
 			}
 		}
-
+		
 		if (!continue_loop) {
 			return;
 		}
