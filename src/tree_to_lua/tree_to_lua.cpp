@@ -448,6 +448,9 @@ int indent) {
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == NAME) {
+			if (indent != 0) {
+				result += "local ";
+			}
 			str_grouped_token(result, v);
 			result += " = function(";
 		}

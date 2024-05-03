@@ -33,7 +33,7 @@ std::string &result_code, std::string &error_str) {
 		error_str = err_msg_str;
 		return false;
 	}
-	print_branch(command_list, 0);
+//	print_branch(command_list, 0);
 
 
 	type_check(command_list);

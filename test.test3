@@ -1,15 +1,10 @@
-type Vec2 {
-	x: number = 0,
-	y: number = 0,
+let a: fn = fn() -> void
+	print(10)
 
-	add: fn = fn(v: Vec2) -> Vec2
-		let result: Vec2 = {}
-		result.x = v.x + self.x
-		result.y = v.y + self.y
-		return result
+	let b: fn = fn() -> void
+		print(20)
 	end
-}
+end
 
-let veca: Vec2 = {}
-let vecb: Vec2 = {}
+
 

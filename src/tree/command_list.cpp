@@ -1070,7 +1070,7 @@ int start_pos, int end_pos) {
 			if (token.str == "let") {
 				if (nx_3.str == "fn") {
 					command_type = LAMBDA_NEW;
-					code_block_count = -1;
+					code_block_count = 0;
 				}
 				else {
 					command_type = VARNEW;
