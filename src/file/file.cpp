@@ -2,6 +2,11 @@
 #include <sstream>
 #include <iostream>
 
+bool file_exist(const std::string &path) {
+	std::ifstream i(path);
+	return i.good();
+}
+
 std::string file_to_str(const std::string &path) {
 	std::ifstream i(path);
 	if (!i.good()) {

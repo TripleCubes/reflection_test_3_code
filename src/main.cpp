@@ -2,6 +2,25 @@
 #include <string>
 #include <iostream>
 #include "file/file.h"
+#include "top_bottom_comments/top_bottom_comments.h"
+
+void write_output_file(const std::string &output_path,
+const std::string &result_code) {
+	std::string top_comments;
+	std::string bottom_comments;
+
+	if (file_exist(output_path)) {
+		std::string output_old_str
+			= file_to_str(output_path);
+
+		top_comments = get_top_comments(output_old_str);
+		bottom_comments = get_bottom_comments(output_old_str);
+	}
+
+	std::cout << "written to " << output_path << std::endl;
+	write_to_file(output_path,
+		top_comments + result_code + bottom_comments);
+}
 
 int main(int argc, char *argv[]) {
 	if (argc > 3) {
@@ -39,8 +58,7 @@ int main(int argc, char *argv[]) {
 
 	if (success) {
 		if (output_path != "") {
-			std::cout << "written to " << output_path << std::endl;
-			write_to_file(output_path, result_code);
+			write_output_file(output_path, result_code);
 		}
 		else {
 			std::cout << result_code << std::endl;
