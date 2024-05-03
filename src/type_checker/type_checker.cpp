@@ -673,6 +673,27 @@ const std::string &type) {
 	}
 }
 
+void typenew_lambda_add_argv(const Branch &argv,
+VarCheckLists &var_check_lists) {
+	for (int i = 0; i < (int)argv.branch_list.size(); i++) {
+		const Branch &v = argv.branch_list[i];
+		const Branch &name_branch = v.branch_list[0];
+		const Branch &type_branch = v.branch_list[1];
+
+		VarDeclare vd;
+		str_grouped_token(vd.var_name, name_branch);
+		str_grouped_token(vd.var_type, type_branch);
+		vd.scope_id = (int)var_check_lists.scope_tree.size();
+		vd.branch = v;
+
+		add_var_declare(
+			var_check_lists.vd_list,
+			var_check_lists.td_list,
+			var_check_lists.fd_list,
+			vd);
+	}
+}
+
 void typenew_check(const Branch &branch,
 VarCheckLists &var_check_lists, int this_scope) {
 	std::string name;
@@ -753,6 +774,10 @@ VarCheckLists &var_check_lists, int this_scope) {
 				var_check_lists.td_list,
 				var_check_lists.fd_list,
 				self_vd);
+
+			const Branch &argv_branch
+			             = right_side.branch_list[2];
+			typenew_lambda_add_argv(argv_branch, var_check_lists);
 
 			std::string return_type;
 			const Branch &return_type_branch
@@ -1322,9 +1347,9 @@ void type_check(const Branch &tree) {
 
 	VarCheckLists var_check_lists;
 	code_block_check(tree, var_check_lists, -1, BLOCK_FUNC, "void");
-//	print_declare_lists(var_check_lists.vd_list,
-//	                    var_check_lists.td_list,
-//	                    var_check_lists.fd_list);
-//	print_scope_tree(var_check_lists.scope_tree);
-//	std::cout << std::endl;
+	print_declare_lists(var_check_lists.vd_list,
+	                    var_check_lists.td_list,
+	                    var_check_lists.fd_list);
+	print_scope_tree(var_check_lists.scope_tree);
+	std::cout << std::endl;
 }

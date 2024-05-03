@@ -1,5 +1,6 @@
 #include "reflection_test_3.h"
 #include <string>
+#include <cstring>
 
 namespace {
 std::string result_code;

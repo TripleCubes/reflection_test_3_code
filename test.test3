@@ -1,7 +1,15 @@
-let a: number = 10
--- this is a comment
-let b: number = 20
+type Vec2 {
+	x: number = 0,
+	y: number = 0,
 
-fn test() -> void
-	let x: number = 30
-end
+	add: fn = fn(v: Vec2) -> Vec2
+		let result: Vec2 = {}
+		result.x = v.x + self.x
+		result.y = v.y + self.y
+		return result
+	end
+}
+
+let veca: Vec2 = {}
+let vecb: Vec2 = {}
+

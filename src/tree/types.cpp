@@ -10,17 +10,17 @@ std::string spaces(int n) {
 	return s;
 }
 
-bool is_temp(BranchType type) {
-	if (type == RIGHT_SIDE_TEMP
-	|| type == ARGV_TEMP
-	|| type == CONDITIONS_TEMP
-	|| type == FOR_ITER_CONDITIONS_TEMP
-	|| type == FUNCNEW_ARGV_TEMP
-	|| type == RETURN_TYPES_TEMP) {
-		return true;
-	}
-	return false;
-}
+//bool is_temp(BranchType type) {
+//	if (type == RIGHT_SIDE_TEMP
+//	|| type == ARGV_TEMP
+//	|| type == CONDITIONS_TEMP
+//	|| type == FOR_ITER_CONDITIONS_TEMP
+//	|| type == FUNCNEW_ARGV_TEMP
+//	|| type == RETURN_TYPES_TEMP) {
+//		return true;
+//	}
+//	return false;
+//}
 }
 
 std::string to_str(BranchType branch_type) {
@@ -105,7 +105,7 @@ void print_branch(Branch branch, int indent) {
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch sub_branch = branch.branch_list[i];
 		
-		if (is_temp(sub_branch.type)) { continue; }
+//		if (is_temp(sub_branch.type)) { continue; }
 
 		print_branch(sub_branch, indent + 1);
 	}
