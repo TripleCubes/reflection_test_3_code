@@ -63,5 +63,6 @@ void type_err_msg(const Branch &branch, TypeErrMsgType type,
 void err_msg_set_code_str(const std::string &in_code_str);
 std::string get_err_msg_str();
 std::string get_type_err_msg_str();
+void clear_err_str();
 
 #endif

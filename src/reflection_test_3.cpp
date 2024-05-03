@@ -12,11 +12,12 @@ bool reflection_test_3(const std::string &code_str,
 std::string &result_code, std::string &error_str) {
 //	std::cout << code_str << std::endl;
 	err_msg_set_code_str(code_str);
+	clear_err_str();
 
 
 	Branch token_list;
 	to_token_list(token_list, code_str);
-	print_branch(token_list, 0);
+//	print_branch(token_list, 0);
 
 
 	Branch grouped_token_list;

@@ -240,3 +240,8 @@ std::string get_err_msg_str() {
 std::string get_type_err_msg_str() {
 	return type_err_msg_str;
 }
+
+void clear_err_str() {
+	err_msg_str = "";
+	type_err_msg_str = "";
+}

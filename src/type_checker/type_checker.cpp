@@ -1318,6 +1318,8 @@ const std::string &return_type) {
 }
 
 void type_check(const Branch &tree) {
+	code_block_return_type_list.clear();
+
 	VarCheckLists var_check_lists;
 	code_block_check(tree, var_check_lists, -1, BLOCK_FUNC, "void");
 //	print_declare_lists(var_check_lists.vd_list,

@@ -51,11 +51,17 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-
+	
 	std::vector<std::string> cpp_file_list;
+	std::string compiler = "g++";
 	std::string src_path = "./src/";
-	std::string build_path = "./build/";
-	std::string output_path = "./build/bin/reflection";
+	std::string build_path = "./build/native/";
+	std::string output_path = build_path + "bin/test3";
+	if (build_web) {
+		compiler = "em++";
+		build_path = "./build/web/";
+		output_path = build_path + "bin/test3.js";
+	}
 	check_folder(cpp_file_list, src_path, src_path);
 
 	for (int i = 0; i < (int)cpp_file_list.size(); i++) {
@@ -63,7 +69,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	std::string link_rule = "all: ";
-	std::string link_str = "\tg++ -Wall -g3 -o " + output_path + " ";
+	std::string link_str = "\t" + compiler + " -Wall -g3 -o "
+		                   + output_path + " ";
 	std::string depend_str = "-include ";
 	std::string obj_str;
 	for (int i = 0; i < (int)cpp_file_list.size(); i++) {
@@ -98,7 +105,8 @@ int main(int argc, char *argv[]) {
 
 		obj_str += o_path + ": " + cpp_path + " makefile\n";
 
-		obj_str += "\tg++ -Wall -g3 -MMD -MP -c " + cpp_path;
+		obj_str += "\t" + compiler + " -Wall -g3 -MMD -MP -c "
+			       + cpp_path;
 		obj_str += " -o " + o_path + "\n";
 		
 		if (i != (int)cpp_file_list.size() - 1) {
@@ -108,6 +116,13 @@ int main(int argc, char *argv[]) {
 	link_rule += "\n";
 	if (linklib) {
 		link_str += " -static-libgcc -static-libstdc++";
+	}
+	if (build_web) {
+		link_str += " -sWASM=0 -sEXPORTED_FUNCTIONS=_test3_gen,";
+		link_str += "_get_result_code_sz,_get_error_str_sz,";
+		link_str += "_get_result_code,_get_error_str,_free";
+		link_str += " -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,";
+		link_str += "stringToNewUTF8,UTF8ToString";
 	}
 	link_str += "\n\n";
 	depend_str += "\n\n";
