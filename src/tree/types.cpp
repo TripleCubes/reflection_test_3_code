@@ -105,7 +105,7 @@ void print_branch(Branch branch, int indent) {
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch sub_branch = branch.branch_list[i];
 		
-//		if (is_temp(sub_branch.type)) { continue; }
+		if (is_temp(sub_branch.type)) { continue; }
 
 		print_branch(sub_branch, indent + 1);
 	}

@@ -1,3 +1,7 @@
 let a: number = 10
 -- this is a comment
 let b: number = 20
+
+fn test() -> void
+	let x: number = 30
+end

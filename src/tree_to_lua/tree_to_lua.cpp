@@ -131,10 +131,14 @@ void str_bracket(std::string &result, const Branch &bracket) {
 	}
 }
 
-void varnew_to_str(std::string &result, const Branch &branch) {
+void varnew_to_str(std::string &result, const Branch &branch,
+int indent) {
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == NAME) {
+			if (indent != 0) {
+				result += "local ";
+			}
 			str_grouped_token(result, v);
 			result += " = ";
 		}
@@ -479,7 +483,7 @@ const Branch &code_block, int indent) {
 		}
 
 		if (v.type == VARNEW) {
-			varnew_to_str(result, v);
+			varnew_to_str(result, v, indent);
 		}
 		else if (v.type == ASSIGN) {
 			assign_to_str(result, v);
