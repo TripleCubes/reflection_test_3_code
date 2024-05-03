@@ -2,7 +2,7 @@
 
 [Syntax and stuffs](syntax_and_stuffs.md) \
 [Online compiler](https://triplecubes.github.io/reflection_test_3) \
-[Online compiler repository](https://github.com/TripleCubes/reflection_test_3) \
+[Online compiler repository](https://github.com/TripleCubes/reflection_test_3)
 
 [How to build](#how-to-build) \
 [How to use](#how-to-use)
