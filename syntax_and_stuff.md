@@ -1,6 +1,9 @@
 ## Reflection, test 3 is still in development. Dont use it for anything important
 
+A typed language that compile to lua
+
 [Syntax](#syntax) \
+[Library functions](#library-functions) \
 [Stuffs that doesnt work](#stuffs-that-doesnt-work) \
 [Stuffs to be added](#stuffs-to-be-added)
 
@@ -67,6 +70,72 @@ type RectWithNum from Rect {
 }
 ```
 
+# Library functions
+
+Lots of lua library functions are renamed. Library functions does
+have type check for their return type but their arguments wont get
+type checked. I will fix this in the next version of Reflection
+
+The tic80 api functions are also available
+
+```
+function array_insert(arr, v)
+	table.insert(arr, v)
+end
+
+function array_insert_at(arr, at, v)
+	table.insert(arr, at, v)
+end
+
+function array_size(arr)
+	return #arr
+end
+
+function array_remove(arr, i)
+	table.remove(arr, i)
+end
+
+function to_number(str)
+	return tonumber(str)
+end
+
+function to_string(num)
+	return tostring(num)
+end
+
+function random_seed()
+	math.randomseed(os.time())
+end
+
+function randomf(a, b)
+	return math.random() * (b - a) + a
+end
+
+function randomi(a, b)
+	return math.random(a, b)
+end
+
+function sin(num)
+	return math.sin(num)
+end
+
+function cos(num)
+	return math.cos(num)
+end
+
+function tan(num)
+	return math.tan(num)
+end
+
+function atan(num)
+	return math.atan(num)
+end
+
+function sqrt(num)
+	return math.sqrt(num)
+end
+```
+
 # Stuffs that doesnt work
 
 These will get fixed in future versions
@@ -108,6 +177,7 @@ print(aaa().x)
 
 # Stuffs to be added
 Tuple (multi return) \
-continue statement
+Continue statement \
+Const
 
 I may add more to this list later
