@@ -7,6 +7,7 @@ std::vector<std::string> skipped_func_list = {
 	"print", "number",
 
 	"array_insert", "void",
+	"array_insert_at", "void",
 	"array_size", "number",
 	"array_remove", "void",
 
@@ -76,6 +77,10 @@ std::vector<std::string> skipped_func_list = {
 std::string lib_func_str =
 	"function array_insert(arr, v)\n"
 	"	table.insert(arr, v)\n"
+	"end\n"
+	"\n"
+	"function array_insert_at(arr, at, v)\n"
+	"	table.insert(arr, at, v)\n"
 	"end\n"
 	"\n"
 	"function array_size(arr)\n"

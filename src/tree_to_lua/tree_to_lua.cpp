@@ -405,10 +405,10 @@ int indent) {
 }
 
 void return_to_str(std::string &result, const Branch &branch) {
+	result += "return ";
 	for (int i = 0; i < (int)branch.branch_list.size(); i++) {
 		Branch v = branch.branch_list[i];
 		if (v.type == BRACKET_ROUND) {
-			result += "return ";
 			str_bracket(result, v);
 		}
 	}
