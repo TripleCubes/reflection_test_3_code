@@ -13,7 +13,9 @@ std::vector<std::string> skipped_func_list = {
 	"to_number", "number",
 	"to_string", "string",
 	
-	"random", "number",
+	"random_seed", "void",
+	"randomf", "number",
+	"randomi", "number",
 	"sin", "number",
 	"cos", "number",
 	"tan", "number",
@@ -92,7 +94,15 @@ std::string lib_func_str =
 	"	return tostring(num)\n"
 	"end\n"
 	"\n"
-	"function random(a, b)\n"
+	"function random_seed()\n"
+	"	math.randomseed(os.time())\n"
+	"end\n"
+	"\n"
+	"function randomf(a, b)\n"
+	"	return math.random() * (b - a) + a\n"
+	"end\n"
+	"\n"
+	"function randomi(a, b)\n"
 	"	return math.random(a, b)\n"
 	"end\n"
 	"\n"
