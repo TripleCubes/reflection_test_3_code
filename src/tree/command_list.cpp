@@ -530,6 +530,7 @@ const Branch &grouped_token_list, int start_pos, int end_pos) {
 		Branch token = grouped_token_list.branch_list[i];
 		if (token.type == KEYWORD && token.str == "do") {
 			code_block_start = i + 1;
+			break;
 		}
 	}
 
