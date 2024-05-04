@@ -540,6 +540,6 @@ const Branch &code_block, int indent) {
 }
 
 void tree_to_lua(std::string &result, const Branch &tree) {
-	result += get_lib_func_str();
 	code_block_to_str(result, tree, 0);
+	result += "\n" + get_lib_func_str();
 }
