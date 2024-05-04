@@ -94,9 +94,9 @@ bool f_is_next_to_value(const Branch &nx) {
 	return false;
 }
 
-bool f_is_next_to_close_bracket(const Branch &nx, int f_bracket_count){
+bool f_is_next_to_close_bracket(const Branch &nx, bool in_func){
 	if (is_next_to_close_bracket(nx)
-	|| (nx.str == "," && f_bracket_count != 1)) {
+	|| (nx.str == "," && in_func)) {
 		return true;
 	}
 	return false;
@@ -112,7 +112,12 @@ bool f_is_next_to_comma(const Branch &nx) {
 bool right_side_check(const Branch &token_list, int start, int end,
 bool in_funccall) {
 	int f_bracket_count = 0;
+	if (in_funccall) {
+		f_bracket_count = 9999;
+	}
+
 	int bracket_count = 0;
+	
 	for (int i = start; i <= end; i++) {
 		Branch v = token_list.branch_list[i];
 		Branch nx;
@@ -187,6 +192,12 @@ bool in_funccall) {
 				if (f_bracket_count == 0) {
 					in_funccall = false;
 				}
+			}
+
+			if (v.str == ")"
+			&& !f_is_next_to_close_bracket(nx, in_funccall)) {
+				err_msg(v, EXPECT_OP);
+				return false;
 			}
 		}
 
@@ -637,31 +648,41 @@ bool while_check(const Branch &token_list, int start, int end) {
 	return true;
 }
 
-bool typenew_member_left_side_check(const Branch &token_list,
+int typenew_member_left_side_check(const Branch &token_list,
 int start, int end) {
 	const std::vector<Branch> &bl = token_list.branch_list;
+	int right_side_start = start + 4;
 
 	if (bl[start].type != NAME) {
 		err_msg(bl[start], EXPECT_VAR_NAME);
-		return false;
+		return -1;
 	}
 
 	if (bl[start + 1].str != ":") {
 		err_msg(bl[start + 1], EXPECT_COLON);
-		return false;
+		return -1;
 	}
 
 	if (!is_var_type(bl[start + 2])) {
 		err_msg(bl[start + 2], EXPECT_VAR_TYPE);
-		return false;
+		return -1;
 	}
 
-	if (bl[start + 3].str != "=") {
-		err_msg(bl[start + 3], EXPECT_EQUAL_SIGN);
-		return false;
+	if (bl[start + 3].str == "[") {
+		if (bl[start + 4].str != "]") {
+			err_msg(bl[start + 4], EXPECT_CLOSE_SQUARE_BRACKET);
+			return -1;
+		}
+
+		right_side_start = start + 6;
 	}
 
-	return true;
+	if (bl[right_side_start - 1].str != "=") {
+		err_msg(bl[right_side_start - 1], EXPECT_EQUAL_SIGN);
+		return -1;
+	}
+
+	return right_side_start;
 }
 
 bool lambda_check(const Branch &token_list, int start, int end) {
@@ -734,9 +755,9 @@ bool typenew_lambda_check(const Branch &token_list,int start,int end) {
 		return false;
 	}
 
-	bool member_check_result
+	int right_side_start
 		= typenew_member_left_side_check(token_list, start, end);
-	if (member_check_result == false) {
+	if (right_side_start == -1) {
 		return false;
 	}
 
@@ -758,14 +779,31 @@ int start,int end) {
 		return false;
 	}
 
-	bool member_check_result
+	int right_side_start
 		= typenew_member_left_side_check(token_list, start, end);
-	if (member_check_result == false) {
+	if (right_side_start == -1) {
 		return false;
 	}
 
+	if (token_list.branch_list[right_side_start].str == "[") {
+		if (token_list.branch_list[end].str != "]") {
+			err_msg(token_list.branch_list[end],
+					EXPECT_CLOSE_SQUARE_BRACKET);
+			return false;
+		}
+		else {
+			bool check_result
+			= right_side_check(token_list,right_side_start+1,
+							   end-1,true);
+			if (check_result == false) {
+				return false;
+			}
+			return true;
+		}
+	}
+
 	bool right_side_check_result
-		= right_side_check(token_list, start + 4, end, false);
+		= right_side_check(token_list, right_side_start, end, false);
 	if (right_side_check_result == false) {
 		return false;
 	}
@@ -782,20 +820,46 @@ int start,int end) {
 		return false;
 	}
 
-	bool check_result
+	int right_side_start
 		= typenew_member_left_side_check(token_list, start, end);
-	if (check_result == false) {
+	if (right_side_start == -1) {
 		return false;
 	}
-	
-	if (bl[start + 4].str != "{") {
-		err_msg(bl[start + 4], EXPECT_OPEN_CURLY_BRACKET);
-		return false;
+
+	bool is_curly_bracket = false;
+	if (bl[right_side_start].str == "{") {
+		is_curly_bracket = true;
 	}
-	
-	if (bl[start + 5].str != "}") {
-		err_msg(bl[start + 5], EXPECT_CLOSE_CURLY_BRACKET);
-		return false;
+
+	if (is_curly_bracket) {
+		if (bl[right_side_start + 1].str != "}") {
+			err_msg(bl[right_side_start+1],EXPECT_CLOSE_CURLY_BRACKET);
+			return false;
+		}
+	}
+	else {
+		if (token_list.branch_list[right_side_start].str == "[") {
+			if (token_list.branch_list[end].str != "]") {
+				err_msg(token_list.branch_list[end],
+						EXPECT_CLOSE_SQUARE_BRACKET);
+				return false;
+			}
+			else {
+				bool check_result
+				= right_side_check(token_list,right_side_start+1,
+				                   end-1,true);
+				if (check_result == false) {
+					return false;
+				}
+				return true;
+			}
+		}
+
+		bool right_side_check_result
+			= right_side_check(token_list,right_side_start,end,false);
+		if (right_side_check_result == false) {
+			return false;
+		}
 	}
 
 	return true;

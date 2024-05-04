@@ -404,8 +404,11 @@ VarCheckLists &var_check_lists, int this_scope) {
 		check_type = right_side_type;
 	}
 
-	if (is_array && var_type[var_type.length()-1] == ']'
-	&& check_type == "[]") {
+	bool left_is_array = false;
+	if (var_type[var_type.length()-1] == ']') {
+		left_is_array = true;
+	}
+	if (is_array && left_is_array && check_type == "[]") {
 		check_type = var_type;
 	}
 	if (!type_compatible(var_check_lists.td_list,var_type,check_type)){
@@ -415,6 +418,10 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 		else {
 			if (check_type != "{}") {
+				type_err_msg(right_side,INCOMPATIBLE_TYPE,
+							 var_type,check_type);
+			}
+			else if (left_is_array) {
 				type_err_msg(right_side,INCOMPATIBLE_TYPE,
 							 var_type,check_type);
 			}
@@ -667,6 +674,13 @@ const std::string &type) {
 		check_type = right_side_type;
 	}
 
+	bool left_is_array = false;
+	if (type[type.length()-1] == ']') {
+		left_is_array = true;
+	}
+	if (is_array && left_is_array && check_type == "[]") {
+		check_type = type;
+	}
 	if (!type_compatible(var_check_lists.td_list,type,check_type)){
 		if (is_primitive(type) || is_array) {
 			type_err_msg(right_side,INCOMPATIBLE_TYPE,
@@ -674,6 +688,10 @@ const std::string &type) {
 		}
 		else {
 			if (check_type != "{}") {
+				type_err_msg(right_side,INCOMPATIBLE_TYPE,
+							 type,check_type);
+			}
+			else if (left_is_array) {
 				type_err_msg(right_side,INCOMPATIBLE_TYPE,
 							 type,check_type);
 			}
