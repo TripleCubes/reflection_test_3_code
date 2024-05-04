@@ -1,6 +1,9 @@
 ## Reflection, test 3 is still under development. Dont use it for anything important
 
+A typed language that compile to lua
+
 [Syntax and stuffs](syntax_and_stuff.md) \
+[Example](example/snake.test3) \
 [Online compiler](https://triplecubes.github.io/reflection_test_3) \
 [Online compiler repository](https://github.com/TripleCubes/reflection_test_3)
 
