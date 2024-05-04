@@ -4,5 +4,6 @@
 #include <string>
 
 std::string get_lib_func_return_type(const std::string &func_name);
+std::string get_lib_func_str();
 
 #endif

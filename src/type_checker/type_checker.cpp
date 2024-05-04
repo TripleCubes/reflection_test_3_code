@@ -357,6 +357,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	std::string var_name;
 	str_grouped_token(var_name, var_name_token);
+
+	std::string lib_func_return_type
+		= get_lib_func_return_type(var_name);
+	if (lib_func_return_type != "") {
+		type_err_msg(var_name_token, CANT_REDECLARE_LIB_FUNC, "", "");
+	}
+
+
 	std::string var_type_test = get_var_type(var_check_lists.vd_list,
 	                              var_name, var_check_lists.scope_tree,
 	                              this_scope);
@@ -502,6 +510,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	std::string var_name;
 	str_grouped_token(var_name, name_token);
+
+	std::string lib_func_return_type
+		= get_lib_func_return_type(var_name);
+	if (lib_func_return_type != "") {
+		type_err_msg(name_token, CANT_REDECLARE_LIB_FUNC, "", "");
+	}
+
+
 	std::string var_type_test = get_var_type(var_check_lists.vd_list,
 	                              var_name, var_check_lists.scope_tree,
 	                              this_scope);
@@ -511,14 +527,11 @@ VarCheckLists &var_check_lists, int this_scope) {
 		return;
 	}
 
-//	FuncDeclare func_declare;
 	std::string func_type = "fn (";
 	for (int i = 0; i < (int)argv_branch.branch_list.size(); i++) {
 		const Branch &v = argv_branch.branch_list[i];
 		std::string type_str;
 		str_grouped_token(type_str, v.branch_list[1]);
-
-//		func_declare.argv.push_back(type_str);
 
 		func_type += type_str;
 		if (i != (int)argv_branch.branch_list.size() - 1) {
@@ -536,11 +549,6 @@ VarCheckLists &var_check_lists, int this_scope) {
 	                var_check_lists.td_list,
 	                var_check_lists.fd_list,
 	                var_declare);
-
-//	func_declare.var_declare_index
-//		= (int)var_check_lists.vd_list.size() - 1;
-//	str_grouped_token(func_declare.return_type, return_type_branch);
-//	var_check_lists.fd_list.push_back(func_declare);
 }
 
 void code_block_check(const Branch &code_block,
@@ -715,6 +723,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 		}
 	}
 
+	std::string lib_func_return_type
+		= get_lib_func_return_type(name);
+	if (lib_func_return_type != "") {
+		type_err_msg(branch.branch_list[0],
+			CANT_REDECLARE_LIB_FUNC, "", "");
+	}
+
+
 	int test_index = get_type_declare_i(var_check_lists.td_list,
 	                                    name);
 	if (test_index != -1) {
@@ -832,6 +848,14 @@ VarCheckLists &var_check_lists, int this_scope) {
 
 	std::string var_name;
 	str_grouped_token(var_name, name_token);
+
+	std::string lib_func_return_type
+		= get_lib_func_return_type(var_name);
+	if (lib_func_return_type != "") {
+		type_err_msg(name_token, CANT_REDECLARE_LIB_FUNC, "", "");
+	}
+
+
 	std::string var_type_test = get_var_type(var_check_lists.vd_list,
 	                              var_name, var_check_lists.scope_tree,
 	                              this_scope);

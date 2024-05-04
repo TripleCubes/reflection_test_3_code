@@ -204,6 +204,9 @@ const std::string &type1, const std::string &type2) {
 	case FUNCNEW_ONLY_IN_ROOT_SCOPE:
 		s = " this function syntax is only valid in global scope";
 		break;
+	case CANT_REDECLARE_LIB_FUNC:
+		s = " name is already used by a library function";
+		break;
 	default:
 		s = " type check unhandled";
 		break;
