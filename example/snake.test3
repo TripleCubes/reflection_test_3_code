@@ -1,0 +1,225 @@
+-- Snake game example for tic80
+-- Compile this file to lua, and then copy paste the compiled code
+-- to tic80 and run the game
+
+let WINDOW_W: number = 240
+let WINDOW_H: number = 136
+
+let TYPE_NONE: number = 0
+let SNAKE: number = 1
+let FOOD: number = 2
+
+let t: number = 0
+
+
+
+type Vec2 {
+	x: number = 0,
+	y: number = 0,
+}
+
+fn vecnew(x: number, y: number) -> Vec2
+	let vec: Vec2 = {}
+	vec.x = x
+	vec.y = y
+	return vec
+end
+
+fn veccopy(vec: Vec2) -> Vec2
+	return vecnew(vec.x, vec.y)
+end
+
+fn veccomp(veca: Vec2, vecb: Vec2) -> bool
+	return veca.x == vecb.x and veca.y == vecb.y
+end
+
+fn vecadd(veca: Vec2, vecb: Vec2) -> Vec2
+	return vecnew(veca.x + vecb.x, veca.y + vecb.y)
+end
+
+fn vecsub(veca: Vec2, vecb: Vec2) -> Vec2
+	return vecnew(veca.x - vecb.x, veca.y - vecb.y)
+end
+
+fn vecmul(vec: Vec2, n: number) -> Vec2
+	return vecnew(vec.x * n, vec.y * n)
+end
+
+fn vecdiv(vec: Vec2, n: number) -> Vec2
+	return vecnew(vec.x / n, vec.y / n)
+end
+
+fn vecdivdiv(vec: Vec2, n: number) -> Vec2
+	return vecnew(vec.x // n, vec.y // n)
+end
+
+fn vecmod(vec: Vec2, n: number) -> Vec2
+	return vecnew(vec.x % n, vec.y % n)
+end
+
+
+
+type Entity {
+	update: fn = fn() -> void
+	end,
+
+	draw: fn = fn() -> void
+	end,
+
+	pos: Vec2 = {},
+	entity_type: number = TYPE_NONE,
+	rm_next_frame: bool = false,
+}
+
+let entity_list: Entity[] = []
+
+fn entity_list_update() -> void
+	for i = array_size(entity_list), 1, -1 do
+		let v: Entity = entity_list[i]
+		if v.rm_next_frame then
+			array_remove(entity_list, i)
+		else
+			v.update()
+		end
+	end
+end
+
+fn entity_list_draw() -> void
+	for i, v in entity_list do
+		v.draw()
+	end
+end
+
+
+
+let UP: number = 0
+let DOWN: number = 1
+let LEFT: number = 2
+let RIGHT: number = 3
+
+type Snake from Entity {
+	entity_type: number = SNAKE,
+	body: Vec2[] = [],
+	dir: number = RIGHT,
+	add_1: bool = false,
+
+	update: fn = fn() -> void
+		if btnp(0) and self.dir ~= DOWN then
+			self.dir = UP
+		elseif btnp(1) and self.dir ~= UP then
+			self.dir = DOWN
+		elseif btnp(2) and self.dir ~= RIGHT then
+			self.dir = LEFT
+		elseif btnp(3) and self.dir ~= LEFT then
+			self.dir = RIGHT
+		end
+
+		if (t % 5 ~= 0) then return end
+
+		let next_pos: Vec2 = {}
+		if     self.dir == UP then next_pos.y = -1
+		elseif self.dir == DOWN then next_pos.y = 1
+		elseif self.dir == LEFT then next_pos.x = -1
+		elseif self.dir == RIGHT then next_pos.x = 1 end
+
+		next_pos = vecadd(next_pos, self.body[1])
+		if next_pos.x < 0 then next_pos.x = WINDOW_W - 1 end
+		if next_pos.x >= WINDOW_W then next_pos.x = 0 end
+		if next_pos.y < 0 then next_pos.y = WINDOW_H - 1 end
+		if next_pos.y >= WINDOW_H then next_pos.y = 0 end
+
+		array_insert_at(self.body, 1, next_pos)
+		if not self.add_1 then
+			array_remove(self.body, array_size(self.body))
+		end
+		self.add_1 = false
+
+
+		for i, v in entity_list do
+			if v.entity_type == FOOD then
+				for j, body_pos in self.body do
+					if veccomp(body_pos, v.pos) then
+						v.rm_next_frame = true
+						self.add_1 = true
+						food_new(vecnew(randomi(0, WINDOW_W-1),
+						                randomi(0, WINDOW_H-1)))
+					end
+				end
+			end
+		end
+
+
+		for i, v in self.body do
+			if i ~= 1 then
+				if veccomp(v, next_pos) then
+					reset_game()
+				end
+			end
+		end
+	end,
+
+	draw: fn = fn() -> void
+		for i, v in self.body do
+			pix(v.x, v.y, 11)
+		end
+	end,
+}
+
+fn snake_new(pos: Vec2) -> Snake
+	let snake: Snake = {}
+	for i = 1, 20 do
+		array_insert(snake.body, veccopy(pos))
+	end
+
+	array_insert(entity_list, snake)
+
+	return snake
+end
+
+
+
+type Food from Entity {
+	entity_type: number = FOOD,
+
+	draw: fn = fn() -> void
+		pix(self.pos.x, self.pos.y, 4)
+	end
+}
+
+fn food_new(pos: Vec2) -> Food
+	let food: Food = {}
+	food.pos = veccopy(pos)
+
+	array_insert(entity_list, food)
+
+	return food
+end
+
+
+
+let snake: Snake = {}
+
+fn reset_game() -> void
+	for i, v in entity_list do
+		v.rm_next_frame = true
+	end
+
+	snake = snake_new(vecnew(WINDOW_W/2, WINDOW_H/2))
+
+	for i = 1, 30 do
+		food_new(vecnew(randomi(0, WINDOW_W-1),randomi(0, WINDOW_H-1)))
+	end
+end
+
+fn BOOT() -> void
+	reset_game()
+end
+
+fn TIC() -> void
+	cls(0)
+
+	entity_list_update()
+	entity_list_draw()
+
+	t = t + 1
+end
