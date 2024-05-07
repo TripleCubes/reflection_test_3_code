@@ -1,4 +1,4 @@
-## Reflection, test 3 is still under development. Dont use it for anything important
+## Reflection, test 3 is made for fun. Dont use it for anything important
 
 A typed language that compile to lua
 
