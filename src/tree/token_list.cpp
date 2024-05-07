@@ -26,7 +26,7 @@ CharType get_char_type(char c) {
 	|| c == '{' || c == '}') {
 		return CHAR_BRACKET;
 	}
-	if (c == ' ' or c == '\t' or c == '\n') {
+	if (c == ' ' or c == '\t' or c == '\n' or c == '\r') {
 		return CHAR_SPACE;
 	}
 	if (c == 39 || c == 34) {
